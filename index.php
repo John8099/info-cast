@@ -22,7 +22,9 @@
                   <!-- <div class="brand-logo">
                     <img src="../../images/logo.svg" alt="logo">
                   </div> -->
-                  <h4>Logo here</h4>
+                  <p>Logo here...</p>
+                  <h4>InfoCast</h4>
+                  <h6 class="font-weight-light">Sign in to continue.</h6>
                   <form class="pt-3" method="POST" id="form-login">
                     <div class="input-group mb-2">
                       <div class="input-group-prepend bg-transparent">
