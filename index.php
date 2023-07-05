@@ -16,12 +16,9 @@
             <div class="row w-100 mx-0">
               <div class="col-lg-5 mx-auto">
                 <div class="auth-form-light text-left py-5 px-4 px-sm-5">
-                  <!-- <div class="brand-logo">
-                    <img src="../../images/logo.svg" alt="logo">
-                  </div> -->
-                  <p>Logo here...</p>
-                  <h4>InfoCast</h4>
-                  <h6 class="font-weight-light">Sign in to continue.</h6>
+                  <div class="brand-logo">
+                    <img class="w-100" src="<?= $SERVER_NAME ?>/public/logo2.png" alt="logo">
+                  </div>
                   <form class="pt-3" method="POST" id="form-login">
                     <div class="input-group mb-2">
                       <div class="input-group-prepend bg-transparent">
@@ -112,7 +109,7 @@
           } else {
             location += "user/"
           }
-          
+
           window.location.replace(location)
         }
       }

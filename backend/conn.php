@@ -17,7 +17,7 @@ $response = array(
 );
 
 try {
-  $conn = mysqli_connect($host, $user, $password, $db, "3310");
+  $conn = mysqli_connect($host, $user, $password, $db);
 } catch (Exception $e) {
   echo "<script>alert('" . ($e->getMessage()) . "')</script>";
 }

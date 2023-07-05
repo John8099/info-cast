@@ -22023,7 +22023,7 @@ code {
 
 .input-group-append .input-group-text,
 .input-group-prepend .input-group-text {
-  border-color: #f1f6f8;
+  /* border-color: #f1f6f8; */
   padding: 0.875rem 0.75rem;
   color: #c9c8c8;
 }
@@ -22031,7 +22031,7 @@ code {
 .form-control, .typeahead,
 .tt-query,
 .tt-hint {
-  border: 1px solid #f1f6f8;
+  /* border: 1px solid #f1f6f8; */
   font-weight: 400;
   font-size: 0.875rem;
   height: auto;
@@ -22345,9 +22345,10 @@ dl li {
 }
 
 .table td img {
-  width: 36px;
-  height: 36px;
+  width: 60px;
+  height: 60px;
   border-radius: 100%;
+  object-fit: cover;
 }
 
 .table td .badge {
@@ -23177,7 +23178,7 @@ dl li {
 .auth .auth-form-light .input-group .tt-hint:focus, .auth .auth-form-light .input-group .form-control:active, .auth .auth-form-light .input-group .typeahead:active,
 .auth .auth-form-light .input-group .tt-query:active,
 .auth .auth-form-light .input-group .tt-hint:active {
-  border-color: #f1f6f8;
+  /* border-color: #f1f6f8; */
 }
 
 .auth .auth-form-transparent {
@@ -23358,7 +23359,7 @@ dl li {
 
 @media (max-width: 991px) {
   .horizontal-menu .top-navbar .navbar-brand-wrapper .navbar-brand {
-    width: 55px;
+    width: 70px;
   }
   .horizontal-menu .top-navbar .navbar-brand-wrapper .navbar-brand.brand-logo {
     display: none;
@@ -23379,7 +23380,7 @@ dl li {
 
 @media (max-width: 991px) {
   .horizontal-menu .top-navbar .navbar-menu-wrapper {
-    width: calc(100% - 55px);
+    /* width: calc(100% - 55px); */
     padding-left: 15px;
     padding-right: 15px;
   }
@@ -23594,7 +23595,7 @@ dl li {
     left: 20px;
     right: 20px;
     top: 78px;
-    width: calc(100% - 40px);
+    width: auto;
   }
 }
 
@@ -23904,11 +23905,11 @@ dl li {
   position: absolute;
   left: 0;
   bottom: 0;
-  border-bottom: 2px solid #0ddbb9;
+  border-bottom: 2px solid #464dee;
 }
 
 .horizontal-menu .bottom-navbar .page-navigation > .nav-item.active > .nav-link .menu-icon {
-  color: #0ddbb9;
+  color: #464dee;
 }
 
 .horizontal-menu .bottom-navbar .page-navigation > .nav-item.active > .nav-link .menu-title,
@@ -24131,4 +24132,11 @@ dl li {
   }
 }
 
+.dtb-popover-close {
+  display: none;
+}
+
+img {
+  object-fit: cover;
+}
 /*# sourceMappingURL=maps/style.css.map */

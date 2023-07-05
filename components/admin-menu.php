@@ -2,18 +2,17 @@
 
   <nav class="navbar top-navbar col-lg-12 col-12 p-0">
     <div class="container-fluid">
-      <div class="navbar-menu-wrapper d-flex align-items-center justify-content-between">
+      <div class="text-center navbar-brand-wrapper d-flex align-items-center ">
+        <a class="navbar-brand brand-logo" >
+          <img src="<?= $SERVER_NAME ?>/public/logo2.png" alt="logo" style="height: 60px; object-fit: cover;" />
+        </a>
+        <a class="navbar-brand brand-logo-mini" >
+          <img src="<?= $SERVER_NAME ?>/public/logo.png" alt="logo" style="height: 45px;width: 100%; object-fit: cover;" />
+        </a>
+      </div>
+      <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
 
-        <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
-          <a class="navbar-brand brand-logo" href="index.html">
-            <img src="<?= $SERVER_NAME ?>/assets/images/logo.svg" alt="logo" />
-          </a>
-          <a class="navbar-brand brand-logo-mini" href="index.html">
-            <img src="<?= $SERVER_NAME ?>/assets/images/logo-mini.svg" alt="logo" />
-          </a>
-        </div>
         <ul class="navbar-nav navbar-nav-right">
-
           <li class="nav-item nav-profile dropdown">
             <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" id="profileDropdown">
               <span class="nav-profile-name">
@@ -56,7 +55,7 @@
         ?>
           <li class="nav-item <?= $value["url"] == str_replace(".php", "", $self) ? "active" : ""  ?>">
             <a class="nav-link" href="<?= $value["url"] ?>">
-              <i class="<?= $value["config"]["icon"] ?>  menu-icon"></i>
+              <i class="<?= $value["config"]["icon"] ?>  menu-icon "></i>
               <span class=" menu-title"><?= $value["title"] ?></span>
             </a>
           </li>

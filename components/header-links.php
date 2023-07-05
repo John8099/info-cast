@@ -5,7 +5,8 @@
 <link rel="stylesheet" href="<?= $SERVER_NAME ?>/assets/vendors/mdi/css/materialdesignicons.min.css">
 <link rel="stylesheet" href="<?= $SERVER_NAME ?>/assets/vendors/base/vendor.bundle.base.css">
 <link rel="stylesheet" href="<?= $SERVER_NAME ?>/assets/css/style.css">
-<link rel="shortcut icon" href="<?= $SERVER_NAME ?>/assets/images/favicon.png" />
+
+<link rel="shortcut icon" href="<?= $SERVER_NAME ?>/public/favicon.png" />
 
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.bootstrap4.min.css">
