@@ -15,9 +15,9 @@ $response = array(
 
 $user = null;
 $isLogin = isset($_SESSION["userId"]) ? true : false;
-// if ($isLogin) {
-//   $user = getUserById($_SESSION["userId"]);
-// }
+if ($isLogin) {
+  $user = getUserById($_SESSION["userId"]);
+}
 
 if (isset($_GET['action'])) {
   try {
@@ -335,7 +335,6 @@ function login()
 
   $email = $_POST["email"];
   $password = $_POST["password"];
-  $role = $_POST["role"];
 
   $query = mysqli_query(
     $conn,
@@ -343,34 +342,33 @@ function login()
   );
 
   if (mysqli_num_rows($query) > 0) {
-    $user = mysqli_fetch_object($query);
-    if ($role != $user->role) {
-      $response["success"] = false;
-      $response["message"] = "You are not allowed to login on this page.";
-    } else {
-      if (password_verify($password, $user->password)) {
-        $response["success"] = true;
-        $_SESSION["userId"] = $user->id;
 
-        if ($role == "admin") {
-          $response["isNew"] = $user->isNew;
-        }
-      } else {
-        $response["success"] = false;
-        $response["message"] = "Password not match.";
+    $user = mysqli_fetch_object($query);
+
+    if (password_verify($password, $user->password)) {
+      $response["success"] = true;
+      $_SESSION["userId"] = $user->id;
+      $response["role"] = $user->role;
+
+      if ($user->role == "admin") {
+        $response["isNew"] = $user->isNew;
       }
+    } else {
+      $response["success"] = false;
+      $response["message"] = "Password not match.";
     }
   } else {
     $response["success"] = false;
     $response["message"] = "User not found.";
   }
 
+
   returnResponse($response);
 }
 
 function logout()
 {
-  global $_SESSION, $_GET;
+  global $_SESSION;
   $_SESSION = array();
 
   if (ini_get("session.use_cookies")) {
@@ -387,9 +385,5 @@ function logout()
   }
 
   session_destroy();
-  if ($_GET["location"] == "user") {
-    header("location: ../");
-  } else {
-    header("location: ../admin/");
-  }
+  header("location: ../");
 }

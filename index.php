@@ -3,9 +3,6 @@
 <html lang="en">
 
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>InfoCast</title>
   <?php include("./components/header-links.php") ?>
 
 </head>
@@ -41,7 +38,7 @@
                           <i class="mdi mdi-shield text-primary"></i>
                         </span>
                       </div>
-                      <input type="password" class="form-control" id="inputPassword" placeholder="Password" required>
+                      <input type="password" name="password" class="form-control" id="inputPassword" placeholder="Password" required>
                     </div>
 
                     <div class="mt-3 d-flex justify-content-center">
@@ -88,21 +85,36 @@
       $(this).serialize(),
       (data, success) => {
         const resp = $.parseJSON(data)
-        swal.fire({
-          title: resp.success ? "Success!" : "Error!",
-          html: resp.message,
-          icon: resp.success ? "success" : "error"
-        }).then(() => {
-          if (!resp.success) return
-
+        if (!resp.success) {
+          swal.fire({
+            title: "Error!",
+            html: resp.message,
+            icon: "error"
+          })
+        } else if (resp.success && resp.isNew === "1") {
+          swal.fire({
+            title: "Your account is newly created",
+            text: "Would you like to change the password?",
+            icon: "question",
+            confirmButtonText: "Yes",
+            confirmButtonColor: "#dc3545",
+            showCancelButton: true,
+            cancelButtonText: "No"
+          }).then((d) => {
+            if (d.isConfirmed) {
+              window.location.replace("<?= $SERVER_NAME ?>/views/change-password");
+            }
+          });
+        } else {
           let location = "<?= $SERVER_NAME ?>/views/";
           if (resp.role === "admin") {
             location += "admin/"
           } else {
             location += "user/"
           }
+          
           window.location.replace(location)
-        })
+        }
       }
     )
   })
