@@ -40,6 +40,12 @@ if (isset($_GET['action'])) {
       case "change_password":
         changePassword();
         break;
+      case "add_admin":
+        add_admin();
+        break;
+      case "create_student_account":
+        create_student_account();
+        break;
       default:
         null;
         break;
@@ -48,6 +54,101 @@ if (isset($_GET['action'])) {
     $response["success"] = false;
     $response["message"] = $e->getMessage();
   }
+}
+
+function create_student_account()
+{
+  global $conn, $_FILES, $_POST;
+
+  $fname = $_POST["fname"];
+  $mname = $_POST["mname"];
+  $lname = $_POST["lname"];
+  $course_id = $_POST["course_id"];
+  $sy = $_POST["sy"];
+  $year = $_POST["year"];
+  $section = $_POST["section"];
+  $contact = $_POST["contact"];
+  $email = $_POST["email"];
+  $password = $_POST["password"];
+
+  if (!checkEmailIfExistF("users", $email)) {
+    $uploadedFile = uploadImg($_FILES["img"], "../media");
+    $avatar = $uploadedFile->success ? $uploadedFile->file_name : null;
+
+    $insertData = array(
+      "fname" => ucwords($fname),
+      "mname" => ucwords($mname),
+      "lname" => ucwords($lname),
+      "course_id" => $course_id,
+      "year" => $year,
+      "section" => strtoupper($section),
+      "sy" => $sy,
+      "email" => $email,
+      "contact" => $contact,
+      "role" => "student",
+      "avatar" => $avatar,
+      "password" => password_hash($password, PASSWORD_ARGON2I)
+    );
+
+    $insert = insert("users", $insertData);
+
+    if ($insert) {
+      $response["success"] = true;
+      $response["message"] = "Your account is successfully created.<br>You can now login to your account.";
+    } else {
+      $response["success"] = false;
+      $response["message"] = mysqli_error($conn);
+    }
+  } else {
+    $response["success"] = false;
+    $response["message"] = "Email already exist.<br>Please try other email.";
+  }
+
+  returnResponse($response);
+}
+
+function add_admin()
+{
+  global $_FILES, $_POST, $conn;
+
+  $fname = $_POST["fname"];
+  $mname = $_POST["mname"];
+  $lname = $_POST["lname"];
+  $email = $_POST["email"];
+  $contact = $_POST["contact"];
+  $password = password_hash("admin123", PASSWORD_ARGON2I);
+
+  if (!checkEmailIfExistF("users", $email)) {
+    $uploadedFile = uploadImg($_FILES["img"], "../media");
+    $avatar = $uploadedFile->success ? $uploadedFile->file_name : null;
+
+    $insertData = array(
+      "fname" => ucwords($fname),
+      "mname" => ucwords($mname),
+      "lname" => ucwords($lname),
+      "email" => $email,
+      "contact" => $contact,
+      "role" => "admin",
+      "avatar" => $avatar,
+      "password" => $password,
+      "isNew" => "1"
+    );
+
+    $insert = insert("users", $insertData);
+
+    if ($insert) {
+      $response["success"] = true;
+      $response["message"] = "Admin successfully added.<br>The default password is <strong>\"admin123\"</strong>";
+    } else {
+      $response["success"] = false;
+      $response["message"] = mysqli_error($conn);
+    }
+  } else {
+    $response["success"] = false;
+    $response["message"] = "Email already exist.<br>Please try other email.";
+  }
+
+  returnResponse($response);
 }
 
 function changePassword()

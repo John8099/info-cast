@@ -7,12 +7,19 @@ $separator = "!I_I!";
 $ORIGIN = "http://$_SERVER[SERVER_NAME]";
 $PATH = ("/" . explode("/", $_SERVER["REQUEST_URI"])[1]);
 
+$divDisplayId = 'display';
+$divBrowseId = 'browse';
+$divClearId = 'clear';
+$inputFileId = 'formInput';
+$inputFileName = 'img';
+
 $SERVER_NAME = "";
 if ($_SERVER['HTTP_HOST'] == "localhost") {
   $SERVER_NAME = ($ORIGIN . $PATH);
 } else {
   $SERVER_NAME = ($ORIGIN);
 }
+
 
 function checkEmailIfExistF($table, $email, $id = null)
 {
@@ -232,6 +239,30 @@ function getFullName($userId, $format = "") // format = with_middle
   }
 
   return $fullName;
+}
+
+function generateImgUpload($userId = null, $divDisplayId = 'display', $divBrowseId = 'browse', $divClearId = 'clear', $inputFileId = 'formInput', $inputFileName = 'img')
+{
+  return ("
+  <div class=\"col-md-12 mb-4\">
+    <div class=\"form-group\">
+      <img src=\"" . (getAvatar($userId)) . "\" class=\"rounded mx-auto d-block\" style=\"width: 150px; height: 150px;\" id=\"" . ($divDisplayId) . "\">
+    </div>
+    <div class=\"mt-3\" style=\"display: flex; justify-content: center;\" id=\"" . ($divBrowseId) . "\">
+      <button type=\"button\" class=\"btn btn-primary btn-sm\" onclick=\"return changeImage('#$inputFileId')\">
+        Browse
+      </button>
+    </div>
+    <div class=\"mt-3\" style=\"display: flex; justify-content: center; \" id=\"" . ($divClearId) . "\">
+      <button type=\"button\" class=\"btn btn-danger btn-sm\" onclick=\"return clearImg('#$divDisplayId', '#$divClearId', '#$divBrowseId')\">
+        Clear
+      </button>
+    </div>
+    <div class=\"mt-3\" style=\"display: none;\">
+      <input class=\"form-control form-control-sm\" type=\"file\" accept=\"image/*\" onchange=\"return previewFile(this, '#$divDisplayId', '#$divClearId', '#$divBrowseId')\" id=\"" . ($inputFileId) . "\" name=\"" . ($inputFileName) . "\">
+    </div>
+  </div>
+  ");
 }
 
 function getAvatar($userId = null)

@@ -1,18 +1,15 @@
 const windowLocation = window.location;
 const origin = windowLocation.origin;
 
-window.createBackendUrl = (action) => {
-  let backendUrl = "";
-  if (windowLocation.host === "localhost") {
-    backendUrl = `${origin}/${
-      windowLocation.pathname.split("/")[1]
-    }/backend/nodes?action=${action}`;
-  } else {
-    backendUrl = `${origin}/backend/nodes?action=${action}`;
-  }
+let host = "";
 
-  return backendUrl;
-};
+if (windowLocation.host === "localhost") {
+  host = `${origin}/${windowLocation.pathname.split("/")[1]}`;
+} else {
+  host = `${origin}`;
+}
+
+window.createBackendUrl = (action) => `${host}/backend/nodes?action=${action}`;
 
 window.deleteData = function (table, col, val) {
   swal
@@ -26,10 +23,9 @@ window.deleteData = function (table, col, val) {
     })
     .then((d) => {
       if (d.isConfirmed) {
-        const host = window.location.host === "localhost" ? "/pharma" : "";
         swal.showLoading();
         $.post(
-          `${window.location.origin}${host}/backend/nodes.php?action=delete_item`,
+          `${host}/backend/nodes.php?action=delete_item`,
           {
             table: table,
             column: col,
@@ -64,13 +60,12 @@ window.changeImage = function (inputId, medId) {
 };
 
 window.clearImg = function (imgDisplayId, divClearId, divBrowseId, medId) {
-  const host = window.location.host === "localhost" ? "/pharma" : "";
   $("input[type=file]").val("");
-  $(imgDisplayId).attr("src", `${host}/public/medicine.png`);
+  $(imgDisplayId).attr("src", `${host}/public/default.png`);
 
   $(divClearId).hide();
   $(divBrowseId).show();
-  $(`#isCleared${medId}`).val("Yes");
+  // $(`#isCleared${medId}`).val("Yes");
 };
 
 window.previewFile = function (input, imgDisplayId, divClearId, divBrowseId) {
@@ -89,3 +84,4 @@ window.previewFile = function (input, imgDisplayId, divClearId, divBrowseId) {
     $(divClearId).show();
   }
 };
+

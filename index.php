@@ -19,11 +19,12 @@
                   <div class="brand-logo">
                     <img class="w-100" src="<?= $SERVER_NAME ?>/public/logo2.png" alt="logo">
                   </div>
+                  <h3 class="text-center">Login you account</h3>
                   <form class="pt-3" method="POST" id="form-login">
                     <div class="input-group mb-2">
                       <div class="input-group-prepend bg-transparent">
                         <span class="input-group-text bg-transparent border-right-0">
-                          <i class="mdi mdi-account-outline text-primary"></i>
+                          <i class="mdi mdi-at text-primary"></i>
                         </span>
                       </div>
                       <input type="email" name="email" class="form-control" placeholder="Email address" required>
@@ -39,7 +40,7 @@
                     </div>
 
                     <div class="mt-3 d-flex justify-content-center">
-                      <button type="submit" class="btn btn-block btn-primary">SIGN IN</button>
+                      <button type="submit" class="btn btn-primary">SIGN IN</button>
                     </div>
                     <div class="form-check">
                       <label class="form-check-label text-muted">
@@ -48,7 +49,7 @@
                       </label>
                     </div>
                     <div class="text-center mt-4 font-weight-light">
-                      Don't have an account? <a href="register.html" class="text-primary">Create</a>
+                      Don't have an account? <a href="./create-account" class="text-primary">Create</a>
                     </div>
                   </form>
                 </div>

@@ -22040,16 +22040,16 @@ code {
 select.form-control, select.typeahead,
 select.tt-query,
 select.tt-hint {
-  padding: .4375rem .75rem;
+  padding: 0.875rem 1.375rem;
   border: 0;
-  outline: 1px solid #f1f6f8;
+  outline: 1px solid #ced4da;
   color: #c9c8c8;
 }
 
 select.form-control:focus, select.typeahead:focus,
 select.tt-query:focus,
 select.tt-hint:focus {
-  outline: 1px solid #f1f6f8;
+  outline: 1px solid #86b7fe;
 }
 
 select.form-control.border-primary, select.border-primary.typeahead,
