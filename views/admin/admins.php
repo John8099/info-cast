@@ -22,7 +22,7 @@ if (!$isLogin) {
             <div class="card-header d-flex justify-content-between align-items-center pt-3 pb-3">
               <h4 class="card-title m-0">Admin List</h4>
 
-              <button type="button" class="btn btn-primary btn-sm" onclick="window.location.replace('./add-admin')">
+              <button type="button" class="btn btn-primary btn-sm" onclick="window.location.href = ('./add-admin')">
                 New Admin
               </button>
             </div>

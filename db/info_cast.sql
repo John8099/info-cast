@@ -26,7 +26,7 @@ SET time_zone = "+00:00";
 --
 -- Table structure for table `course`
 --
-
+DROP TABLE IF EXISTS `course`;
 CREATE TABLE `course` (
   `course_id` int(11) NOT NULL,
   `name` varchar(250) NOT NULL,
@@ -39,7 +39,7 @@ CREATE TABLE `course` (
 --
 -- Table structure for table `users`
 --
-
+DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `id` int(11) NOT NULL,
   `fname` varchar(250) NOT NULL,

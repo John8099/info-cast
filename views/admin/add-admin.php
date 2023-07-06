@@ -22,7 +22,7 @@ if (!$isLogin) {
             <div class="card-header d-flex justify-content-between align-items-center pt-3 pb-3">
               <h4 class="card-title m-0">Add new admin</h4>
 
-              <button type="button" class="btn btn-secondary btn-sm" onclick="window.location.replace('./admins')">
+              <button type="button" class="btn btn-secondary btn-sm" onclick="return goBack()">
                 Go back
               </button>
             </div>
@@ -58,7 +58,15 @@ if (!$isLogin) {
                   <input type="text" class="form-control" name="contact" placeholder="Contact number" required>
                 </div>
 
-                <button type="submit" class="btn btn-primary me-2">Submit</button>
+                <div class="mt-3 d-flex justify-content-center">
+                  <button type="submit" class="btn btn-primary m-1">
+                    Submit
+                  </button>
+                  <button type="submit" class="btn btn-danger m-1" onclick="return goBack()">
+                    Cancel
+                  </button>
+                </div>
+
               </form>
             </div>
           </div>

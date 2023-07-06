@@ -22870,7 +22870,7 @@ dl li {
   -webkit-transition: .4s;
   transition: .4s;
   border-radius: 34px;
-  border: 1px solid #f1f6f8;
+  border: 1px solid #ced4da;
 }
 
 .toggle-switch .toggle-slider:before {
@@ -22884,6 +22884,7 @@ dl li {
   -webkit-transition: .4s;
   transition: .4s;
   border-radius: 50%;
+  border: 1px solid #ced4da;
 }
 
 .toggle-switch input {

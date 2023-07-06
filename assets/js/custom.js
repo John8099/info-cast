@@ -11,6 +11,8 @@ if (windowLocation.host === "localhost") {
 
 window.createBackendUrl = (action) => `${host}/backend/nodes?action=${action}`;
 
+window.goBack = () => window.history.back();
+
 window.deleteData = function (table, col, val) {
   swal
     .fire({
@@ -84,4 +86,3 @@ window.previewFile = function (input, imgDisplayId, divClearId, divBrowseId) {
     $(divClearId).show();
   }
 };
-
