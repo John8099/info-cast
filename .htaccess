@@ -5,9 +5,9 @@
 
   RewriteEngine on
 
-  # ErrorDocument 403 http://%{HTTP_HOST}/pharma/error?403
-  # ErrorDocument 404 http://%{HTTP_HOST}/pharma/error?404
-  # ErrorDocument 500 http://%{HTTP_HOST}/pharma/error?500
+  # ErrorDocument 403 http://%{HTTP_HOST}/info-cast/error?403
+  # ErrorDocument 404 http://%{HTTP_HOST}/info-cast/error?404
+  # ErrorDocument 500 http://%{HTTP_HOST}/info-cast/error?500
 
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteCond %{REQUEST_FILENAME}\.php -f

@@ -3,6 +3,8 @@ include("../../backend/nodes.php");
 
 if (!$isLogin) {
   header("location: ../../index.php");
+} else if ($user && $user->role != "admin") {
+  header("location: ../user");
 }
 ?>
 <!DOCTYPE html>
@@ -29,39 +31,56 @@ if (!$isLogin) {
                     </button>
                   </div>
                   <div class="card-body">
-                    <?php if ($_GET['page'] == "add") : ?>
-                      <form id="add-course" action="POST">
+                    <?php
+                    $name = "";
+                    $acronym = "";
+                    $status = "active";
+                    $formId = "add-course";
+                    $courseId = "";
 
-                        <div class="form-group">
-                          <label>Name</label>
-                          <input type="text" name="name" class="form-control" required>
-                        </div>
+                    if ($_GET["page"] == "edit" && isset($_GET["course_id"])) {
+                      $courseData = getTableSingleDataById("course", "course_id", $_GET["course_id"]);
+                      $name = $courseData->name;
+                      $acronym = $courseData->acronym;
+                      $status = $courseData->status;
+                      $formId = "edit-course";
+                      $courseId = $courseData->course_id;
+                    }
+                    ?>
+                    <form id="<?= $formId ?>" action="POST">
 
-                        <div class="form-group">
-                          <label>Acronym</label>
-                          <input type="text" name="acronym" class="form-control" required>
-                        </div>
+                      <?php if ($_GET["page"] == "edit" && isset($_GET["course_id"])) : ?>
+                        <input type="text" name="course_id" value="<?= $courseId ?>" readonly hidden>
+                      <?php endif; ?>
 
-                        <div class="form-group">
-                          <label>Active</label>
-                          <label class="toggle-switch ms-2">
-                            <input type="checkbox" name="active" checked>
-                            <span class="toggle-slider round"></span>
-                          </label>
-                        </div>
+                      <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" name="name" class="form-control" value="<?= $name ?>" required>
+                      </div>
 
-                        <div class="mt-3 d-flex justify-content-center">
-                          <button type="submit" class="btn btn-primary m-2">
-                            Submit
-                          </button>
-                          <button type="button" class="btn btn-danger m-2" onclick="return goBack()">
-                            Cancel
-                          </button>
-                        </div>
-                      </form>
+                      <div class="form-group">
+                        <label>Acronym</label>
+                        <input type="text" name="acronym" class="form-control" value="<?= $acronym ?>" required>
+                      </div>
 
-                    <?php elseif ($_GET['page'] == "edit") : ?>
-                    <?php endif; ?>
+                      <div class="form-group">
+                        <label>Active</label>
+                        <label class="toggle-switch ms-2">
+                          <input type="checkbox" name="active" <?= $status == "active" ? "checked" : "" ?>>
+                          <span class="toggle-slider round"></span>
+                        </label>
+                      </div>
+
+                      <div class="mt-3 d-flex justify-content-center">
+                        <button type="submit" class="btn btn-primary m-2">
+                          Submit
+                        </button>
+                        <button type="button" class="btn btn-danger m-2" onclick="return goBack()">
+                          Cancel
+                        </button>
+                      </div>
+                    </form>
+
                   </div>
                 </div>
               </div>
@@ -91,17 +110,24 @@ if (!$isLogin) {
                       $courseData = getTableData("course");
 
                       foreach ($courseData as $course) :
+                        $isStatusActive = $course->status == "active" ? true : false;
                       ?>
                         <tr>
-                          <td> <?= $course->name ?> </td>
-                          <td> <?= $course->acronym ?> </td>
-                          <td> <?= $course->status ?> </td>
+                          <td style="vertical-align: middle;"> <?= $course->name ?> </td>
+                          <td style="vertical-align: middle;"> <?= $course->acronym ?> </td>
+                          <td style="vertical-align: middle;">
+                            <span class="d-flex align-items-center">
+                              <i class="mdi mdi-checkbox-blank-circle status text-<?= $isStatusActive ? "success" : "danger" ?> me-2"></i>
+                              <?= ucfirst($course->status) ?>
+                            </span>
+
+                          </td>
                           <td>
-                            <button type="button" class="btn btn-sm btn-warning m-1" onclick="return window.location.replace('./courses?page=edit&&course_id=<?= $course->course_id ?>')">
+                            <button type="button" class="btn btn-sm btn-warning m-1" onclick="return window.location.href =('./courses?page=edit&&course_id=<?= $course->course_id ?>')">
                               Edit
                             </button>
                             <button type="button" class="btn btn-sm btn-danger m-1" onclick="deleteData('course', 'course_id', '<?= $course->course_id ?>')">
-                              Edit
+                              Delete
                             </button>
                           </td>
 
@@ -122,6 +148,38 @@ if (!$isLogin) {
   <?php include("../../components/scripts.php"); ?>
 </body>
 <script>
+  $("#add-course").on("submit", function(e) {
+    e.preventDefault()
+    swal.showLoading()
+    const backendLoc = createBackendUrl("add_course")
+    $.post(
+      backendLoc,
+      $(this).serialize(),
+      (data, success) => {
+        const resp = $.parseJSON(data)
+        swal.fire({
+          title: resp.success ? "Success" : "Error",
+          html: resp.message,
+          icon: resp.success ? "success" : "error"
+        }).then(() => resp.success ? window.location.href = './courses' : undefined)
+      })
+  })
+  $("#edit-course").on("submit", function(e) {
+    e.preventDefault()
+    swal.showLoading()
+    const backendLoc = createBackendUrl("edit_course")
+    $.post(
+      backendLoc,
+      $(this).serialize(),
+      (data, success) => {
+        const resp = $.parseJSON(data)
+        swal.fire({
+          title: resp.success ? "Success" : "Error",
+          html: resp.message,
+          icon: resp.success ? "success" : "error"
+        }).then(() => resp.success ? window.location.href = './courses' : undefined)
+      })
+  })
   $(document).ready(function() {
     const tableId = "#courseTable";
     var table = $(tableId).DataTable({
@@ -136,9 +194,12 @@ if (!$isLogin) {
           button: 'Filter',
         }
       },
+      "columnDefs": [{
+        "width": "20%",
+        "targets": 3
+      }],
       buttons: [{
         extend: 'searchBuilder',
-
       }],
       dom: 'Bfrtip',
     });

@@ -48,9 +48,14 @@
                       <div class="col-md-8">
                         <div class="form-group">
                           <label>Course</label>
-                          <select name="course_id" class="form-control" required>
-                            <option value="" disabled>-- Select Course --</option>
-                            <option value="1" disabled>Test</option>
+                          <select name="course_id" class=" form-control" required>
+                            <option value="" selected disabled>-- Select Course --</option>
+                            <?php
+                            $getCourseData = getTableData("course");
+                            foreach ($getCourseData as $course) :
+                            ?>
+                              <option value="<?= $course->course_id ?>"><?= "($course->acronym) $course->name" ?></option>
+                            <?php endforeach; ?>
                           </select>
                         </div>
                       </div>
@@ -63,7 +68,7 @@
                     </div>
 
                     <div class="row">
-                      <div class="col-md-6">
+                      <div class="col-md-3">
                         <div class="form-group">
                           <label>Year</label>
                           <input type="text" maxlength="1" name="year" class="form-control" placeholder="Year" required>
@@ -75,7 +80,7 @@
                           <input type="text" maxlength="1" name="section" class="form-control" placeholder="Section" required>
                         </div>
                       </div>
-                      <div class="col-md-3">
+                      <div class="col-md-6">
                         <div class="form-group">
                           <label>Contact number</label>
                           <input type="text" name="contact" class="form-control" placeholder="Contact number" required>
@@ -107,15 +112,15 @@
                       </div>
                     </div>
 
-                    <div class="mt-3 d-flex justify-content-center">
-                      <button type="submit" class="btn btn-primary">CREATE</button>
-                    </div>
-
                     <div class="form-check">
                       <label class="form-check-label text-muted">
                         <input type="checkbox" class="form-check-input" id="checkShow">
                         Show password
                       </label>
+                    </div>
+
+                    <div class="mt-3 d-flex justify-content-center">
+                      <button type="submit" class="btn btn-primary">CREATE</button>
                     </div>
 
                     <div class="text-center mt-4 font-weight-light">
@@ -159,8 +164,7 @@
           html: resp.message,
           icon: resp.success ? "success" : "error"
         }).then(() => resp.success ? window.location.href = './' : undefined)
-      }
-    )
+      })
   })
 </script>
 

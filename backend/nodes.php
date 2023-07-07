@@ -38,13 +38,22 @@ if (isset($_GET['action'])) {
         deleteItem();
         break;
       case "change_password":
-        changePassword();
+        change_password();
         break;
       case "add_admin":
         add_admin();
         break;
       case "create_student_account":
         create_student_account();
+        break;
+      case "add_course":
+        add_course();
+        break;
+      case "edit_course":
+        edit_course();
+        break;
+      case "set_graduate":
+        set_graduate();
         break;
       default:
         null;
@@ -54,6 +63,98 @@ if (isset($_GET['action'])) {
     $response["success"] = false;
     $response["message"] = $e->getMessage();
   }
+}
+
+function set_graduate()
+{
+  global $conn, $_POST;
+
+  $ids = $_POST["ids"];
+  $dateNow = date("Y-m-d");
+
+  $query = mysqli_query(
+    $conn,
+    "UPDATE users SET `role`='alumni', set_graduate_at='$dateNow' WHERE id in(" . implode(', ', $ids) . ")"
+  );
+
+  if ($query) {
+    $response["success"] = true;
+    $response["message"] = "Selected students are successfully set to graduates.";
+  } else {
+    $response["success"] = false;
+    $response["message"] = mysqli_error($conn);
+  }
+
+  returnResponse($response);
+}
+
+function edit_course()
+{
+  global $conn, $_POST;
+
+  $course_id = $_POST["course_id"];
+  $name = ucwords($_POST["name"]);
+  $acronym = $_POST["acronym"];
+  $active = isset($_POST["active"]) ? "active" : "inactive";
+
+  $checkCourse = getTableWithWhere("course", "name LIKE '%$name%' AND acronym LIKE '%$acronym%' and course_id <> $course_id");
+
+  if (count($checkCourse) > 0) {
+    $response["success"] = false;
+    $response["message"] = "Course already exist";
+  } else {
+    $courseData = array(
+      "name" => $name,
+      "acronym" => $acronym,
+      "status" => $active,
+    );
+
+    $in = update("course", $courseData, "course_id", $course_id);
+
+    if ($in) {
+      $response["success"] = true;
+      $response["message"] = "Course successfully updated.";
+    } else {
+      $response["success"] = false;
+      $response["message"] = mysqli_error($conn);
+    }
+  }
+
+  returnResponse($response);
+}
+
+function add_course()
+{
+  global $conn, $_POST;
+
+  $name = ucwords($_POST["name"]);
+  $acronym = $_POST["acronym"];
+  $active = isset($_POST["active"]) ? "active" : "inactive";
+
+  $checkCourse = getTableWithWhere("course", "name LIKE '%$name%' AND acronym LIKE '%$acronym%'");
+
+  if (count($checkCourse) > 0) {
+    $response["success"] = false;
+    $response["message"] = "Course already exist";
+  } else {
+    $courseData = array(
+      "name" => $name,
+      "acronym" => $acronym,
+      "status" => $active,
+    );
+
+    $in = insert("course", $courseData);
+
+    if ($in) {
+      $response["success"] = true;
+      $response["message"] = "Course successfully added.";
+    } else {
+      $response["success"] = false;
+      $response["message"] = mysqli_error($conn);
+    }
+  }
+
+  returnResponse($response);
 }
 
 function create_student_account()
@@ -72,8 +173,11 @@ function create_student_account()
   $password = $_POST["password"];
 
   if (!checkEmailIfExistF("users", $email)) {
-    $uploadedFile = uploadImg($_FILES["img"], "../media");
-    $avatar = $uploadedFile->success ? $uploadedFile->file_name : null;
+    $avatar = null;
+    if (isset($_FILES["img"])) {
+      $uploadedFile = uploadImg($_FILES["img"], "../media");
+      $avatar = $uploadedFile->success ? $uploadedFile->file_name : null;
+    }
 
     $insertData = array(
       "fname" => ucwords($fname),
@@ -151,30 +255,41 @@ function add_admin()
   returnResponse($response);
 }
 
-function changePassword()
+function change_password()
 {
-  global $conn, $_POST;
+  global $conn, $_POST, $_SESSION;
 
-  $userId = $_POST["userId"];
-  $password = $_POST["nPassword"];
+  $userId = $_SESSION["userId"];
+  $old = $_POST["old"];
+  $new = $_POST["new"];
 
-  $update = update(
-    "users",
-    array(
-      "password" => md5($password),
-      "isNew" => "set_null"
-    ),
-    "id",
-    $userId
-  );
+  $user = getUserById($userId);
 
-  if ($update) {
-    $response["success"] = true;
-    $response["userId"] = $userId;
-    $response["message"] = "Password successfully change";
-  } else {
+  if ($old == $new) {
     $response["success"] = false;
-    $response["message"] = mysqli_error($conn);
+    $response["message"] = "Old password and New password should not be the same.";
+  } else if (!password_verify($old, $user->password)) {
+    $response["success"] = false;
+    $response["message"] = "Old password doesnt match!";
+  } else {
+    $update = update(
+      "users",
+      array(
+        "password" => password_hash($new, PASSWORD_ARGON2I),
+        "isNew" => "set_null"
+      ),
+      "id",
+      $userId
+    );
+
+    if ($update) {
+      $response["success"] = true;
+      $response["userId"] = $userId;
+      $response["message"] = "Password successfully change";
+    } else {
+      $response["success"] = false;
+      $response["message"] = mysqli_error($conn);
+    }
   }
 
   returnResponse($response);

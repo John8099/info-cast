@@ -39,14 +39,15 @@
                       <input type="password" name="password" class="form-control" id="inputPassword" placeholder="Password" required>
                     </div>
 
-                    <div class="mt-3 d-flex justify-content-center">
-                      <button type="submit" class="btn btn-primary">SIGN IN</button>
-                    </div>
                     <div class="form-check">
                       <label class="form-check-label text-muted">
                         <input type="checkbox" class="form-check-input" id="checkShow">
                         Show password
                       </label>
+                    </div>
+
+                    <div class="mt-3 d-flex justify-content-center">
+                      <button type="submit" class="btn btn-primary">SIGN IN</button>
                     </div>
                     <div class="text-center mt-4 font-weight-light">
                       Don't have an account? <a href="./create-account" class="text-primary">Create</a>
@@ -95,12 +96,14 @@
             text: "Would you like to change the password?",
             icon: "question",
             confirmButtonText: "Yes",
-            confirmButtonColor: "#dc3545",
+            cancelButtonColor: "#dc3545",
             showCancelButton: true,
             cancelButtonText: "No"
           }).then((d) => {
             if (d.isConfirmed) {
-              window.location.replace("<?= $SERVER_NAME ?>/views/change-password");
+              window.location.href = ("<?= $SERVER_NAME ?>/views/change-password");
+            } else {
+              window.location.replace("<?= $SERVER_NAME ?>/views/admin/")
             }
           });
         } else {

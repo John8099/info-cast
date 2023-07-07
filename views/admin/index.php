@@ -3,6 +3,8 @@ include("../../backend/nodes.php");
 
 if (!$isLogin) {
   header("location: ../../index.php");
+} else if ($user && $user->role != "admin") {
+  header("location: ../user");
 }
 ?>
 <!DOCTYPE html>

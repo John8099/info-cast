@@ -14,12 +14,32 @@ $inputFileId = 'formInput';
 $inputFileName = 'img';
 
 $SERVER_NAME = "";
-if ($_SERVER['HTTP_HOST'] == "localhost") {
+
+if (inWhiteList($_SERVER['REMOTE_ADDR'])) {
   $SERVER_NAME = ($ORIGIN . $PATH);
 } else {
   $SERVER_NAME = ($ORIGIN);
 }
 
+function getTableWithWhere($table, $condition = null)
+{
+  global $conn;
+
+  $data = array();
+
+  $cond = $condition ? " WHERE $condition" : "";
+
+  $query = mysqli_query(
+    $conn,
+    "SELECT * FROM $table $cond"
+  );
+
+  while ($res = mysqli_fetch_object($query)) {
+    array_push($data, $res);
+  }
+
+  return $data;
+}
 
 function checkEmailIfExistF($table, $email, $id = null)
 {
@@ -291,4 +311,24 @@ function pr($data)
   echo "<pre>";
   print_r($data); // or var_dump($data);
   echo "</pre>";
+}
+
+function inWhiteList($val)
+{
+  $whitelist = array(
+    '127.0.0.1',
+    '::1',
+    '192.168'
+  );
+
+  $inList = false;
+
+  foreach ($whitelist as $ip) {
+    if (str_contains($val, $ip)) {
+      $inList = true;
+      break;
+    }
+  }
+
+  return $inList;
 }

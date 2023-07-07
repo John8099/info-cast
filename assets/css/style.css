@@ -22024,7 +22024,7 @@ code {
 .input-group-append .input-group-text,
 .input-group-prepend .input-group-text {
   /* border-color: #f1f6f8; */
-  padding: 0.875rem 0.75rem;
+  padding: 0.9rem 0.75rem;
   color: #c9c8c8;
 }
 
@@ -22043,7 +22043,7 @@ select.tt-hint {
   padding: 0.875rem 1.375rem;
   border: 0;
   outline: 1px solid #ced4da;
-  color: #c9c8c8;
+  /* color: #c9c8c8; */
 }
 
 select.form-control:focus, select.typeahead:focus,
@@ -23171,7 +23171,7 @@ dl li {
 }
 
 .auth .auth-form-light select {
-  color: #c9c8c8;
+  /* color: #c9c8c8; */
 }
 
 .auth .auth-form-light .input-group .form-control:focus, .auth .auth-form-light .input-group .typeahead:focus,
@@ -24139,5 +24139,12 @@ dl li {
 
 img {
   object-fit: cover;
+}
+
+.status {
+  font-size: 12px;
+  margin-right: 0.1rem;
+  display: inline-block;
+  height: auto;
 }
 /*# sourceMappingURL=maps/style.css.map */
