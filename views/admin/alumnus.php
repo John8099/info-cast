@@ -43,7 +43,7 @@ if (!$isLogin) {
                       <th>Email</th>
                       <th>Contact</th>
                       <th>Created Date</th>
-                      <th>Set to Graduate</th>
+                      <th>Date Updated to Alumni</th>
                     </tr>
                   </thead>
                   <tbody>

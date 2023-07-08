@@ -87,10 +87,10 @@ if (!$isLogin) {
   <?php include("../../components/scripts.php"); ?>
 </body>
 <script>
-  function setStudentToGraduate(studentIds) {
+  function setStudentToAlumni(studentIds) {
     swal.showLoading()
     if (studentIds.length > 0) {
-      const backendLoc = createBackendUrl("set_graduate")
+      const backendLoc = createBackendUrl("set_alumni")
       $.post(
         backendLoc, {
           ids: studentIds
@@ -144,7 +144,7 @@ if (!$isLogin) {
         'selectAll',
         'selectNone',
         {
-          text: 'Set Graduate',
+          text: 'Set Alumni',
           action: function() {
             let count = table.rows({
               selected: true
@@ -161,11 +161,11 @@ if (!$isLogin) {
                 selectedIds.push(data[data.length - 1])
               })
 
-              setStudentToGraduate(selectedIds)
+              setStudentToAlumni(selectedIds)
 
             } else {
               swal.fire({
-                html: "Cannot set graduate(s) with no selected row(s).",
+                html: "Cannot set to alumni with no selected row(s).",
                 icon: "warning"
               })
             }

@@ -52,8 +52,8 @@ if (isset($_GET['action'])) {
       case "edit_course":
         edit_course();
         break;
-      case "set_graduate":
-        set_graduate();
+      case "set_alumni":
+        set_alumni();
         break;
       default:
         null;
@@ -65,7 +65,7 @@ if (isset($_GET['action'])) {
   }
 }
 
-function set_graduate()
+function set_alumni()
 {
   global $conn, $_POST;
 
@@ -79,7 +79,7 @@ function set_graduate()
 
   if ($query) {
     $response["success"] = true;
-    $response["message"] = "Selected students are successfully set to graduates.";
+    $response["message"] = "Selected students are successfully set to alumni.";
   } else {
     $response["success"] = false;
     $response["message"] = mysqli_error($conn);
