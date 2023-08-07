@@ -56,4 +56,28 @@ $links = array(
       "icon" => "mdi mdi-city"
     )
   ),
+  array(
+    "title" => "Activity Log",
+    "url" => "$SERVER_NAME/views/admin/activities",
+    "allowedViews" => array("admin"),
+    "config" => array(
+      "icon" => "mdi mdi-history"
+    )
+  ),
+  array(
+    "title" => "Announcements",
+    "url" => "$SERVER_NAME/views/user/announcements",
+    "allowedViews" => array("student", "teacher", "alumni"),
+    "config" => array(
+      "icon" => "mdi mdi-bullhorn"
+    )
+  ),
+  array(
+    "title" => "About",
+    "url" => "$SERVER_NAME/views/user/about",
+    "allowedViews" => array("student", "teacher", "alumni"),
+    "config" => array(
+      "icon" => "mdi mdi-information"
+    )
+  ),
 );

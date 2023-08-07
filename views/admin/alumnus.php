@@ -112,7 +112,9 @@ if (!$isLogin) {
     var table = $(tableId).DataTable({
       paging: true,
       lengthChange: true,
-      ordering: true,
+      order: [
+        [1, 'asc']
+      ],
       info: true,
       autoWidth: false,
       responsive: true,
@@ -122,6 +124,10 @@ if (!$isLogin) {
           button: 'Filter',
         }
       },
+      columnDefs: [{
+        "targets": [0],
+        "orderable": false
+      }],
       buttons: [{
         extend: 'searchBuilder',
         config: {

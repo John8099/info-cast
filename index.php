@@ -111,7 +111,7 @@
           if (resp.role === "admin") {
             location += "admin/"
           } else {
-            location += "user/"
+            location += "user/announcements"
           }
 
           window.location.replace(location)

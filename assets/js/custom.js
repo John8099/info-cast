@@ -21,6 +21,25 @@ window.createBackendUrl = (action) => `${host}/backend/nodes?action=${action}`;
 
 window.goBack = () => window.history.back();
 
+window.handleOpenModalImg = (el, modalId, modalImgId, captionId) => {
+  $(`#${modalImgId}`).attr("src", el[0].src);
+  $(`#${captionId}`).html(el[0].alt);
+  $("html").css({
+    overflow: "hidden",
+  });
+  $(`#${modalId}`).show();
+};
+
+window.handleClose = (modalId, modalImgId, captionId) => {
+  $(`#${modalId}`).fadeOut("slow", function () {
+    $(`#${modalImgId}`).attr("src", "");
+    $(`#${captionId}`).html("");
+    $("html").css({
+      overflow: "visible",
+    });
+  });
+};
+
 window.deleteData = function (table, col, val) {
   swal
     .fire({
@@ -64,18 +83,33 @@ window.deleteData = function (table, col, val) {
     });
 };
 
-window.changeImage = function (inputId, medId) {
+window.changeImage = function (inputId, inputIsCleared) {
   $(inputId).click();
-  $(`#isCleared${medId}`).val("No");
+
+  $(inputIsCleared).val("no");
 };
 
-window.clearImg = function (imgDisplayId, divClearId, divBrowseId, medId) {
+window.clearImg = function (
+  imgDisplayId,
+  divClearId,
+  divBrowseId,
+  inputIsCleared,
+  imagePath = ""
+) {
   $("input[type=file]").val("");
-  $(imgDisplayId).attr("src", `${host}/public/default.png`);
+  if (!imagePath) {
+    $(imgDisplayId).attr("src", `${host}/public/default.png`);
+  } else {
+    $(imgDisplayId).attr("src", imagePath);
+  }
 
-  $(divClearId).hide();
-  $(divBrowseId).show();
-  // $(`#isCleared${medId}`).val("Yes");
+  $(divClearId).addClass("d-none").removeClass("d-flex");
+  $(divBrowseId).addClass("d-flex").removeClass("d-none");
+
+  // $(divClearId).hide();
+  // $(divBrowseId).show();
+
+  $(inputIsCleared).val("yes");
 };
 
 window.previewFile = function (input, imgDisplayId, divClearId, divBrowseId) {
@@ -90,7 +124,10 @@ window.previewFile = function (input, imgDisplayId, divClearId, divBrowseId) {
 
     reader.readAsDataURL(file);
 
-    $(divBrowseId).hide();
-    $(divClearId).show();
+    $(divClearId).addClass("d-flex").removeClass("d-none");
+    $(divBrowseId).addClass("d-none").removeClass("d-flex");
+
+    // $(divBrowseId).hide();
+    // $(divClearId).show();
   }
 };

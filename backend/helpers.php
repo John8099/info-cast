@@ -12,6 +12,8 @@ $divBrowseId = 'browse';
 $divClearId = 'clear';
 $inputFileId = 'formInput';
 $inputFileName = 'img';
+$inputIsClearedId = "isCleared";
+$inputIsClearedName = "imgIsCleared";
 
 $SERVER_NAME = "";
 
@@ -19,6 +21,17 @@ if (inWhiteList($_SERVER['REMOTE_ADDR'])) {
   $SERVER_NAME = ($ORIGIN . $PATH);
 } else {
   $SERVER_NAME = ($ORIGIN);
+}
+
+function generateModalImg($modalId, $modalImg, $captionId)
+{
+  return "
+    <div id='$modalId' class='div-modal pt-5'>
+      <span class='close' onclick='handleClose(`$modalId`, `$modalImg`, `$captionId`)'>&times;</span>
+      <img class='div-modal-content' id='$modalImg'>
+      <div id='$captionId'></div>
+    </div>
+  ";
 }
 
 function getTableWithWhere($table, $condition = null)
@@ -117,10 +130,9 @@ function update($table, $data, $columnWHere, $columnVal)
       foreach ($data as $column => $value) {
         if ($value) {
           array_push($set, "$column = '" . mysqli_escape_string($conn, $value) . "'");
-        }
-
-        if ($value == "set_null") {
-          array_push($set, "$column = NULL");
+          if ($value == "set_null") {
+            array_push($set, "$column = NULL");
+          }
         }
       }
 
@@ -168,7 +180,11 @@ function insert($table, $data)
       foreach ($data as $column => $value) {
         if ($value) {
           array_push($columns, "`$column`");
-          array_push($values, "'" . mysqli_escape_string($conn, $value) . "'");
+          if ($value == "set_zero") {
+            array_push($values, "'0'");
+          } else {
+            array_push($values, "'" . mysqli_escape_string($conn, $value) . "'");
+          }
         }
       }
 
@@ -261,31 +277,59 @@ function getFullName($userId, $format = "") // format = with_middle
   return $fullName;
 }
 
-function generateImgUpload($userId = null, $divDisplayId = 'display', $divBrowseId = 'browse', $divClearId = 'clear', $inputFileId = 'formInput', $inputFileName = 'img')
-{
+function generateImgUpload(
+  $userId = null,
+  $imgPath = null,
+  $divDisplayId = 'display',
+  $divBrowseId = 'browse',
+  $divClearId = 'clear',
+  $inputFileId = 'formInput',
+  $inputFileName = 'img',
+  $inputIsClearedId = "isCleared",
+  $inputIsClearedName = "imgIsCleared"
+) {
+  /**
+   *  N O T E
+   *  Is cleared input can be applicable with update user only
+   */
+
+  $imgSrc = "";
+  if ($imgPath) {
+    $imgSrc = getAvatar($userId, $imgPath);
+  } else {
+    $imgSrc = getAvatar($userId);
+  }
+  $explodedImgSrc = explode("/", $imgSrc);
+  $isDefaultImg = $explodedImgSrc[count($explodedImgSrc) - 2] == "public" ? true : false;
+
+  $hideBrowseButtonLogic = $isDefaultImg ? "flex" : "none";
+  $hideClearButtonLogic = $isDefaultImg ? "none" : "flex";
+
   return ("
   <div class=\"col-md-12 mb-4\">
     <div class=\"form-group\">
-      <img src=\"" . (getAvatar($userId)) . "\" class=\"rounded mx-auto d-block\" style=\"width: 150px; height: 150px;\" id=\"" . ($divDisplayId) . "\">
+      <img src=\"" . ($imgSrc) . "\" class=\"rounded mx-auto d-block\" style=\"width: 150px; height: 150px;\" id=\"" . ($divDisplayId) . "\">
     </div>
-    <div class=\"mt-3\" style=\"display: flex; justify-content: center;\" id=\"" . ($divBrowseId) . "\">
-      <button type=\"button\" class=\"btn btn-primary btn-sm\" onclick=\"return changeImage('#$inputFileId')\">
+    <div class=\"mt-3 d-$hideBrowseButtonLogic justify-content-center\" id=\"" . ($divBrowseId) . "\">
+      <button type=\"button\" class=\"btn btn-primary btn-sm\" onclick=\"return changeImage('#$inputFileId', '#$inputIsClearedId')\">
         Browse
       </button>
     </div>
-    <div class=\"mt-3\" style=\"display: flex; justify-content: center; \" id=\"" . ($divClearId) . "\">
-      <button type=\"button\" class=\"btn btn-danger btn-sm\" onclick=\"return clearImg('#$divDisplayId', '#$divClearId', '#$divBrowseId')\">
+    <div class=\"mt-3 d-$hideClearButtonLogic justify-content-center\"  id=\"" . ($divClearId) . "\">
+      <button type=\"button\" class=\"btn btn-danger btn-sm\" onclick=\"return clearImg('#$divDisplayId', '#$divClearId', '#$divBrowseId', '#$inputIsClearedId', '$imgPath')\">
         Clear
       </button>
     </div>
     <div class=\"mt-3\" style=\"display: none;\">
       <input class=\"form-control form-control-sm\" type=\"file\" accept=\"image/*\" onchange=\"return previewFile(this, '#$divDisplayId', '#$divClearId', '#$divBrowseId')\" id=\"" . ($inputFileId) . "\" name=\"" . ($inputFileName) . "\">
     </div>
+
+    <input type=\"text\" value=\"no\" name=\"$inputIsClearedName\" id=\"$inputIsClearedId\" hidden>
   </div>
   ");
 }
 
-function getAvatar($userId = null)
+function getAvatar($userId = null, $imgPath = null)
 {
   global $SERVER_NAME;
   if ($userId) {
@@ -296,7 +340,7 @@ function getAvatar($userId = null)
     }
   }
 
-  return "$SERVER_NAME/public/default.png";
+  return $imgPath ? $imgPath : "$SERVER_NAME/public/default.png";
 }
 
 function returnResponse($params)
@@ -311,6 +355,45 @@ function pr($data)
   echo "<pre>";
   print_r($data); // or var_dump($data);
   echo "</pre>";
+}
+
+function get_time_ago($time)
+{
+  $time_difference = time() - $time;
+
+  if ($time_difference < 1) {
+    return 'less than 1 second ago';
+  }
+  $condition = array(
+    12 * 30 * 24 * 60 * 60 =>  'year',
+    30 * 24 * 60 * 60       =>  'month',
+    24 * 60 * 60            =>  'day',
+    60 * 60                 =>  'hour',
+    60                      =>  'minute',
+    1                       =>  'second'
+  );
+
+  foreach ($condition as $secs => $str) {
+    $d = $time_difference / $secs;
+
+    if ($d >= 1) {
+      $t = round($d);
+      return $t . ' ' . $str . ($t > 1 ? 's' : '') . ' ago';
+    }
+  }
+}
+
+function is_connected()
+{
+  $connected = @fsockopen("www.example.com", 80);
+  //website, port  (try 80 or 443)
+  if ($connected) {
+    $is_conn = true; //action when connected
+    fclose($connected);
+  } else {
+    $is_conn = false; //action in connection failure
+  }
+  return $is_conn;
 }
 
 function inWhiteList($val)

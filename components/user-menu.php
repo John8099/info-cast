@@ -25,10 +25,6 @@
                 <i class="mdi mdi-account-settings text-primary"></i>
                 My Profile
               </a>
-              <a href="<?= $SERVER_NAME ?>/views/admin/settings" class="dropdown-item">
-                <i class="mdi mdi-settings text-primary"></i>
-                Settings
-              </a>
               <a href="<?= $SERVER_NAME ?>/backend/nodes?action=logout" class="dropdown-item">
                 <i class="mdi mdi-logout text-primary"></i>
                 Logout
@@ -43,28 +39,38 @@
     </div>
   </nav>
 
-  <nav class="bottom-navbar">
-    <div class="container">
-      <ul class="nav page-navigation">
-        <?php
-        include_once("links.php");
-        $self = "http://{$_SERVER['SERVER_NAME']}{$_SERVER['REQUEST_URI']}";
+  <nav class="bottom-navbar justify-content-center">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="container">
+          <ul class="nav page-navigation">
+            <?php
+            include_once("links.php");
+            $self = "http://{$_SERVER['SERVER_NAME']}{$_SERVER['REQUEST_URI']}";
 
-        $navBarLinks = array_filter(
-          $links,
-          fn ($val) => in_array($user->role, $val["allowedViews"]),
-          ARRAY_FILTER_USE_BOTH
-        );
-        foreach ($navBarLinks as $key => $value) :
-        ?>
-          <li class="nav-item <?= $value["url"] == str_replace(".php", "", $self) ? "active" : ""  ?>">
-            <a class="nav-link" href="<?= $value["url"] ?>">
-              <i class="<?= $value["config"]["icon"] ?>  menu-icon "></i>
-              <span class=" menu-title"><?= $value["title"] ?></span>
-            </a>
-          </li>
-        <?php endforeach; ?>
-      </ul>
+            $navBarLinks = array_filter(
+              $links,
+              fn ($val) => in_array($user->role, $val["allowedViews"]),
+              ARRAY_FILTER_USE_BOTH
+            );
+            foreach ($navBarLinks as $key => $value) :
+            ?>
+              <li class="nav-item <?= $value["url"] == str_replace(".php", "", $self) ? "active" : ""  ?>">
+                <a class="nav-link" href="<?= $value["url"] ?>">
+                  <i class="<?= $value["config"]["icon"] ?>  menu-icon "></i>
+                  <span class=" menu-title"><?= $value["title"] ?></span>
+                </a>
+              </li>
+            <?php endforeach; ?>
+            <li class="nav-item <?= ($SERVER_NAME . "/views/user/notification") == str_replace(".php", "", $self) ? "active" : ""  ?>">
+              <a class="nav-link" href="<?= $SERVER_NAME . "/views/user/notification" ?>">
+                <i class="mdi mdi-bell menu-icon "></i>
+                <span class=" menu-title">Notifications</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
   </nav>
 </div>

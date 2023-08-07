@@ -90,7 +90,6 @@ if (!$isLogin) {
                   <table id="adminTable" class="table table-striped">
                     <thead>
                       <tr>
-                        <th></th>
                         <th>Avatar</th>
                         <th>Name</th>
                         <th>Email</th>
@@ -109,7 +108,6 @@ if (!$isLogin) {
                         while ($userRes = mysqli_fetch_object($adminQuery)) :
                       ?>
                           <tr>
-                            <td></td>
                             <td class="py-1">
                               <img src="<?= getAvatar($userRes->id) ?>" alt="image" style="object-fit: cover;">
                             </td>
@@ -170,7 +168,9 @@ if (!$isLogin) {
     var table = $(tableId).DataTable({
       paging: true,
       lengthChange: false,
-      ordering: true,
+      order: [
+        [1, 'asc']
+      ],
       info: true,
       autoWidth: false,
       responsive: true,
@@ -179,6 +179,10 @@ if (!$isLogin) {
           button: 'Filter',
         }
       },
+      columnDefs: [{
+        "targets": [0],
+        "orderable": false
+      }],
       buttons: [{
         extend: 'searchBuilder',
 

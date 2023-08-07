@@ -20,7 +20,7 @@
                     <img class="w-50" src="<?= $SERVER_NAME ?>/public/logo2.png" alt="logo">
                   </div>
                   <h3 class="text-center">Create your account</h3>
-                  <form class="pt-3" method="POST" id="form-create-account">
+                  <form class="pt-3" method="POST" id="form-create-account" enctype="multipart/form-data">
                     <?= generateImgUpload() ?>
 
                     <div class="row">
@@ -153,18 +153,32 @@
   $("#form-create-account").on("submit", function(e) {
     e.preventDefault()
     swal.showLoading()
+    
     const backendLoc = createBackendUrl("create_student_account")
-    $.post(
-      backendLoc,
-      $(this).serialize(),
-      (data, success) => {
+
+    $.ajax({
+      url: backendLoc,
+      type: "POST",
+      data: new FormData(this),
+      contentType: false,
+      cache: false,
+      processData: false,
+      success: function(data) {
         const resp = $.parseJSON(data)
         swal.fire({
           title: resp.success ? "Success" : "Error",
           html: resp.message,
           icon: resp.success ? "success" : "error"
         }).then(() => resp.success ? window.location.href = './' : undefined)
-      })
+      },
+      error: function(data) {
+        swal.fire({
+          title: 'Oops...',
+          text: 'Something went wrong.',
+          icon: 'error',
+        })
+      }
+    });
   })
 </script>
 

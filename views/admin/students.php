@@ -12,11 +12,6 @@ if (!$isLogin) {
 
 <head>
   <?php include("../../components/header-links.php") ?>
-  <style>
-    select.form-control {
-      padding: 5px 10px;
-    }
-  </style>
 </head>
 
 <body>
@@ -28,7 +23,6 @@ if (!$isLogin) {
           <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center pt-3 pb-3">
               <h4 class="card-title m-0">Student List</h4>
-
             </div>
             <div class="card-body">
               <div class="table-responsive">
@@ -43,14 +37,14 @@ if (!$isLogin) {
                       <th>School Year</th>
                       <th>Email</th>
                       <th>Contact</th>
-                      <th>Created Date</th>
-                      <th>Created Time</th>
+                      <th>Registered Date</th>
+                      <th>Registered Time</th>
                       <th class="d-none"></th>
                     </tr>
                   </thead>
                   <tbody>
                     <?php
-                    $getStudentData = getTableWithWhere("users", "role='student'");
+                    $getStudentData = getTableWithWhere("users", "role='student' and is_verified='2'");
                     foreach ($getStudentData as $student) :
                       $course = "";
                       $courseData = getTableSingleDataById("course", "course_id", $student->course_id);
@@ -116,7 +110,9 @@ if (!$isLogin) {
     var table = $(tableId).DataTable({
       paging: true,
       lengthChange: true,
-      ordering: true,
+      order: [
+        [2, 'asc']
+      ],
       info: true,
       autoWidth: false,
       responsive: true,
@@ -127,10 +123,15 @@ if (!$isLogin) {
         }
       },
       columnDefs: [{
-        orderable: false,
-        className: 'select-checkbox',
-        targets: 0
-      }],
+          orderable: false,
+          className: 'select-checkbox',
+          targets: 0
+        },
+        {
+          "targets": [0, 1],
+          "orderable": false
+        },
+      ],
       select: {
         style: 'multi',
         selector: 'td:first-child'

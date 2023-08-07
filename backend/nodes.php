@@ -28,8 +28,8 @@ if (isset($_GET['action'])) {
       case "login":
         login();
         break;
-      case "update-user":
-        updateUser();
+      case "update_user":
+        update_user();
         break;
       case "check_email":
         checkEmailIfExistR();
@@ -46,6 +46,9 @@ if (isset($_GET['action'])) {
       case "create_student_account":
         create_student_account();
         break;
+      case "create_teacher_account":
+        create_teacher_account();
+        break;
       case "add_course":
         add_course();
         break;
@@ -54,6 +57,15 @@ if (isset($_GET['action'])) {
         break;
       case "set_alumni":
         set_alumni();
+        break;
+      case "update_settings":
+        update_settings();
+        break;
+      case "verify_student":
+        verify_student();
+        break;
+      case "verify_account":
+        verify_account();
         break;
       default:
         null;
@@ -65,9 +77,141 @@ if (isset($_GET['action'])) {
   }
 }
 
+function verify_account()
+{
+  global $conn, $_POST, $_FILES;
+
+  $student_id = $_POST["id"];
+
+  $verification_img = null;
+
+  if (isset($_FILES["img"])) {
+    $uploadedFile = uploadImg($_FILES["img"], "../media/verification");
+    $verification_img = $uploadedFile->success ? $uploadedFile->file_name : null;
+  }
+
+  if ($verification_img) {
+    $verificationData = array(
+      "is_verified" => "1",
+      "verification_img" => $verification_img
+    );
+
+    $update = update("users", $verificationData, "id", $student_id);
+
+    if ($update) {
+      $response["success"] = true;
+      $response["message"] = "Successfully submitted verification.<br>Please wait for the admin to review your verification.";
+    } else {
+      $response["success"] = false;
+      $response["message"] = mysqli_error($conn);
+    }
+  } else {
+    if ($_FILES["img"]["error"] == 4) {
+      $response["success"] = false;
+      $response["message"] = "No file was uploaded.<br>Please upload your School ID to verify your account.";
+    } else {
+      $response["success"] = false;
+      $response["message"] = "Error uploading verification image.<br>Please try again later.";
+    }
+  }
+
+  returnResponse($response);
+}
+
+function verify_student()
+{
+  global $conn, $_POST, $_SESSION;
+
+  $student_id = $_POST["student_id"];
+  $action = $_POST["action"];
+
+  $studentVerificationData = array(
+    "is_verified" => $action == "approve" ? "2" : "3"
+  );
+
+  $update = update("users", $studentVerificationData, "id", $student_id);
+
+  if ($update) {
+    $response["success"] = true;
+    $response["message"] = ("Successfully $action" . "d student verification.");
+    
+    $notification_content = ("Your account verification was $action" . "d by the Admin.");
+    add_notification($_SESSION["userId"], $student_id, $notification_content);
+
+    $studentName = getFullName($student_id, "with_email");
+    $activityAction = ucwords($action);
+
+    insertActivity("<strong>$activityAction</strong> '$studentName' verification.", $_SESSION["userId"]);
+  } else {
+    $response["success"] = false;
+    $response["message"] = mysqli_error($conn);
+  }
+
+  returnResponse($response);
+}
+
+function add_notification($created_by, $user_id, $content)
+{
+  $insertData = array(
+    "created_by" => $created_by,
+    "user_id" => $user_id,
+    "content" => $content
+  );
+
+  insert("notification", $insertData);
+}
+
+function verificationImg($userId)
+{
+  global $SERVER_NAME;
+  $user = getUserById($userId);
+
+  if ($user->verification_img) {
+    $alt = preg_split("/\d+-\d+_/", $user->verification_img)[1];
+    return "<img onclick='handleModalOpen($(this))' class='modalImg' src='$SERVER_NAME/media/verification/$user->verification_img' alt='$alt' style='object-fit: cover;'>";
+  }
+
+  return '<span class="badge badge-danger rounded-pill px-2" style="font-size: 14px">
+  No Verification Image
+</span>';
+}
+
+function insertActivity($action, $userId)
+{
+  $insertData = array(
+    "user_id" => $userId,
+    "action" => $action
+  );
+
+  insert("activity", $insertData);
+}
+
+function update_settings()
+{
+  global $conn, $_POST, $_SESSION;
+
+  $teacher_reg = $_POST["teacher_reg"] == "true" ? "1" : "0";
+
+  $updateSet = mysqli_query(
+    $conn,
+    "UPDATE settings SET teacher_reg='$teacher_reg' "
+  );
+
+  if ($updateSet) {
+    $response["success"] = true;
+    $action = $teacher_reg == "1" ? "ON" : "OFF";
+    insertActivity("<strong>Turned $action</strong> Teacher registration.", $_SESSION["userId"]);
+  } else {
+    $response["success"] = false;
+    $response["message"] = mysqli_error($conn);
+  }
+
+  returnResponse($response);
+}
+
 function set_alumni()
 {
-  global $conn, $_POST;
+  global $conn, $_POST, $_SESSION;
 
   $ids = $_POST["ids"];
   $dateNow = date("Y-m-d");
@@ -80,6 +224,13 @@ function set_alumni()
   if ($query) {
     $response["success"] = true;
     $response["message"] = "Selected students are successfully set to alumni.";
+
+    $names = "";
+    foreach ($ids as $id) {
+      $names .= ("'" . getFullName($id, "with_middle") . "'");
+    }
+
+    insertActivity("Set [$names] to alumni", $_SESSION["userId"]);
   } else {
     $response["success"] = false;
     $response["message"] = mysqli_error($conn);
@@ -90,7 +241,7 @@ function set_alumni()
 
 function edit_course()
 {
-  global $conn, $_POST;
+  global $conn, $_POST, $_SESSION;
 
   $course_id = $_POST["course_id"];
   $name = ucwords($_POST["name"]);
@@ -108,12 +259,20 @@ function edit_course()
       "acronym" => $acronym,
       "status" => $active,
     );
-
+    $courseDb = getTableData("course", "course_id", $course_id);
     $in = update("course", $courseData, "course_id", $course_id);
 
     if ($in) {
       $response["success"] = true;
       $response["message"] = "Course successfully updated.";
+
+      $courseName = $courseDb[0]->name;
+      $courseAcronym = $courseDb[0]->acronym;
+
+      $newActive = ucwords($active);
+      $oldActive = ucwords($courseDb[0]->status);
+
+      insertActivity(("<strong>Edited Course: </strong> '($courseAcronym) $courseName' to '($acronym) $name' <strong>Status:</strong> '$oldActive' to '$newActive'."), $_SESSION["userId"]);
     } else {
       $response["success"] = false;
       $response["message"] = mysqli_error($conn);
@@ -125,7 +284,7 @@ function edit_course()
 
 function add_course()
 {
-  global $conn, $_POST;
+  global $conn, $_POST, $_SESSION;
 
   $name = ucwords($_POST["name"]);
   $acronym = $_POST["acronym"];
@@ -148,10 +307,61 @@ function add_course()
     if ($in) {
       $response["success"] = true;
       $response["message"] = "Course successfully added.";
+      $stat = ucwords($active);
+      insertActivity(("<strong>New Course:</strong> '($acronym) $name' <strong>Status:</strong> $stat."), $_SESSION["userId"]);
     } else {
       $response["success"] = false;
       $response["message"] = mysqli_error($conn);
     }
+  }
+
+  returnResponse($response);
+}
+
+function create_teacher_account()
+{
+  global $conn, $_FILES, $_POST;
+
+  $fname = $_POST["fname"];
+  $mname = $_POST["mname"];
+  $lname = $_POST["lname"];
+  $course_id = $_POST["course_id"];
+  $contact = $_POST["contact"];
+  $email = $_POST["email"];
+  $password = $_POST["password"];
+
+  if (!checkEmailIfExistF("users", $email)) {
+    $avatar = null;
+    if (isset($_FILES["img"])) {
+      $uploadedFile = uploadImg($_FILES["img"], "../media");
+      $avatar = $uploadedFile->success ? $uploadedFile->file_name : null;
+    }
+
+    $insertData = array(
+      "fname" => ucwords($fname),
+      "mname" => ucwords($mname),
+      "lname" => ucwords($lname),
+      "course_id" => $course_id,
+      "email" => $email,
+      "contact" => $contact,
+      "role" => "teacher",
+      "avatar" => $avatar,
+      "password" => password_hash($password, PASSWORD_ARGON2I),
+      "is_verified" => "1"
+    );
+
+    $insert = insert("users", $insertData);
+
+    if ($insert) {
+      $response["success"] = true;
+      $response["message"] = "Your account is successfully created.<br>You can now login to your account.";
+    } else {
+      $response["success"] = false;
+      $response["message"] = mysqli_error($conn);
+    }
+  } else {
+    $response["success"] = false;
+    $response["message"] = "Email already exist.<br>Please try other email.";
   }
 
   returnResponse($response);
@@ -191,7 +401,8 @@ function create_student_account()
       "contact" => $contact,
       "role" => "student",
       "avatar" => $avatar,
-      "password" => password_hash($password, PASSWORD_ARGON2I)
+      "password" => password_hash($password, PASSWORD_ARGON2I),
+      "is_verified" => "set_zero"
     );
 
     $insert = insert("users", $insertData);
@@ -213,7 +424,7 @@ function create_student_account()
 
 function add_admin()
 {
-  global $_FILES, $_POST, $conn;
+  global $_FILES, $_POST, $conn, $_SESSION;
 
   $fname = $_POST["fname"];
   $mname = $_POST["mname"];
@@ -243,6 +454,7 @@ function add_admin()
     if ($insert) {
       $response["success"] = true;
       $response["message"] = "Admin successfully added.<br>The default password is <strong>\"admin123\"</strong>";
+      insertActivity(("<strong>Added new admin:</strong> '" . getFullName($insert, "with_middle") . "'."), $_SESSION["userId"]);
     } else {
       $response["success"] = false;
       $response["message"] = mysqli_error($conn);
@@ -270,7 +482,7 @@ function change_password()
     $response["message"] = "Old password and New password should not be the same.";
   } else if (!password_verify($old, $user->password)) {
     $response["success"] = false;
-    $response["message"] = "Old password doesnt match!";
+    $response["message"] = "Old password does not match!";
   } else {
     $update = update(
       "users",
@@ -297,16 +509,30 @@ function change_password()
 
 function deleteItem()
 {
-  global $_POST, $conn;
+  global $_POST, $conn, $_SESSION;
 
   $table = $_POST["table"];
   $column = $_POST["column"];
   $val = $_POST["val"];
 
+  $activity = "";
+  switch ($table) {
+    case "course":
+      $getCourseData = getTableData($table, $column, $val);
+      $courseData = $getCourseData[0];
+      $activity = "<strong>Deleted course:</strong> '($courseData->acronym) $courseData->name'.";
+      break;
+    default:
+      null;
+  }
+
   $del = delete($table, $column, $val);
 
   if ($del) {
     $response["success"] = true;
+    if ($activity) {
+      insertActivity($activity, $_SESSION["userId"]);
+    }
   } else {
     $response["success"] = false;
     $response["message"] = mysqli_error($conn);
@@ -332,214 +558,85 @@ function checkEmailIfExistR()
 }
 
 
-function updateUser()
+function update_user()
 {
-  global $conn, $_POST, $_FILES;
+  global $conn, $_FILES, $_POST;
 
-  $profile = $_FILES["profile"];
-  $userId = $_POST['id'];
-  $uploadedFile = "";
+  $userId = $_POST["id"];
+  $fname = $_POST["fname"];
+  $mname = $_POST["mname"];
+  $lname = $_POST["lname"];
+  $contact = $_POST["contact"];
+  $email = $_POST["email"];
 
-  if (intval($profile["error"]) == 0) {
-    $uploadFile = date("mdY-his") . "_" . basename($profile['name']);
-    $target_dir = "../media";
-
-    if (!is_dir($target_dir)) {
-      mkdir($target_dir, 0777, true);
+  if (!checkEmailIfExistF("users", $email, $userId)) {
+    $avatar = null;
+    if (isset($_FILES["img"])) {
+      if ($_POST["imgIsCleared"] == "yes") {
+        $avatar = "set_null";
+      } else {
+        $uploadedFile = uploadImg($_FILES["img"], "../media");
+        $avatar = $uploadedFile->success ? $uploadedFile->file_name : null;
+      }
     }
 
-    if (move_uploaded_file($profile['tmp_name'], "$target_dir/$uploadFile")) {
-      $uploadedFile = $uploadFile;
+    if ($_POST["role"] == "admin") {
+      $updateData = array(
+        "fname" => ucwords($fname),
+        "mname" => ucwords($mname),
+        "lname" => ucwords($lname),
+        "email" => $email,
+        "contact" => $contact,
+        "avatar" => $avatar,
+      );
+    } else {
+      $course_id = $_POST["course_id"];
+
+      if ($_POST["role"] == "teacher") {
+        $updateData = array(
+          "fname" => ucwords($fname),
+          "mname" => ucwords($mname),
+          "lname" => ucwords($lname),
+          "course_id" => $course_id,
+          "email" => $email,
+          "contact" => $contact,
+          "role" => "student",
+          "avatar" => $avatar,
+        );
+      } else {
+        // Role Student
+        $sy = $_POST["sy"];
+        $year = $_POST["year"];
+        $section = $_POST["section"];
+
+        $updateData = array(
+          "fname" => ucwords($fname),
+          "mname" => ucwords($mname),
+          "lname" => ucwords($lname),
+          "course_id" => $course_id,
+          "year" => $year,
+          "section" => strtoupper($section),
+          "sy" => $sy,
+          "email" => $email,
+          "contact" => $contact,
+          "role" => "student",
+          "avatar" => $avatar,
+        );
+      }
+    }
+
+    $update = update("users", $updateData, "id", $userId);
+
+    if ($update) {
+      $response["success"] = true;
+      $response["message"] = "Profile successfully updated";
     } else {
       $response["success"] = false;
-      $response["message"] = "Error uploading profile.<br>Please try again later.";
+      $response["message"] = mysqli_error($conn);
     }
-    exit();
-  }
-
-  $personalData = array(
-    "first_name" => ucwords($_POST["fname"]),
-    "middle_name" => ucwords($_POST["mname"]),
-    "last_name" => ucwords($_POST["lname"]),
-    "course_id" => $_POST["course"],
-    "year" => ucwords($_POST["year"]),
-    "section" => ucwords($_POST["section"]),
-    "school" => ucwords($_POST["school"]),
-    "place_of_birth" => ucwords($_POST["pob"]),
-    "date_of_birth" => $_POST["dob"],
-    "gender" => ucwords($_POST["gender"]),
-    "address" => ucwords($_POST["address"]),
-    "mobile_number" => $_POST["mobileNumber"],
-    "email" => $_POST["email"],
-    "blood_type" => ucwords($_POST["bloodType"]),
-    "body_built" => ucwords($_POST["bodyBuilt"]),
-    "height" => $_POST["height"],
-    "weight" => $_POST["weight"],
-    "ethnic_group" => ucwords($_POST["ethnicGroup"]),
-    "religion" => ucwords($_POST["religion"]),
-    "citizenship" => ucwords($_POST["citizenship"]),
-    "identification_mark" => $_POST["identificationMark"],
-    "hair_color" => ucwords($_POST["hairColor"]),
-    "eye_color" => ucwords($_POST["eyeColor"]),
-    "civil_status" => ucwords($_POST["civil"]),
-    "avatar" => "$uploadedFile"
-  );
-
-  $updatePersonalData = update("users", $personalData, "id", $userId);
-  if ($updatePersonalData) {
-    // Civil Data
-    if ($_POST["civil"] == "Married") {
-      $civilData = array(
-        "name_of_spouse" => ucwords($_POST["spouseName"]),
-        "address" => ucwords($_POST["spouseAddress"]),
-        "contact" => $_POST["spouseContact"],
-        "occupation" => ucwords($_POST["spouseOccupation"]),
-        "company_name" => ucwords($_POST["spouseCompany"])
-      );
-
-      if (isset($_POST['civil_id'])) {
-        update("civil", $civilData, "user_id", $userId);
-      } else {
-        $civilData["user_id"] = $userId;
-        insert("civil", $civilData);
-      }
-    } else {
-      $civilDataDB = getTableData("civil", "user_id", $userId);
-
-      if ($civilDataDB) {
-        delete("civil", "civil_id", $userId);
-      }
-    }
-
-    // Children Data
-    if (count($_POST["childrenName"]) > 1) {
-
-      for ($i = 0; $i < count($_POST["childrenName"]); $i++) {
-        $childrenData = array(
-          "name" => ucwords($_POST["childrenName"][$i]),
-          "date_of_birth" => $_POST["childrenDOB"][$i],
-          "place_birth" => $_POST["childrenPOB"][$i],
-          "grade_or_year" => $_POST["childrenGradeOrYearLevel"][$i],
-          "school" => ucwords($_POST["childrenSchool"][$i])
-        );
-
-        if ($_POST["childrenID"][$i] != "0") {
-          update("childrens", $childrenData, "children_id", $_POST["childrenID"][$i]);
-        } else {
-          $childrenData["user_id"] = $userId;
-          insert("childrens", $childrenData);
-        }
-      }
-    } else {
-      $childrenData = array(
-        "name" => ucwords($_POST["childrenName"][0]),
-        "date_of_birth" => $_POST["childrenDOB"][0],
-        "place_birth" => $_POST["childrenPOB"][0],
-        "grade_or_year" => $_POST["childrenGradeOrYearLevel"][0],
-        "school" => ucwords($_POST["childrenSchool"][0])
-      );
-
-      if ($_POST["childrenID"][0] != "0") {
-        update("childrens", $childrenData, "children_id", $_POST["childrenID"][0]);
-      } else {
-        $childrenData["user_id"] = $userId;
-        insert("childrens", $childrenData);
-      }
-    }
-
-    // Family Data
-    $familyData = array(
-      "father_name" => ucwords($_POST["fatherName"]),
-      "father_date_of_birth" => $_POST["fatherDOB"],
-      "father_place_of_birth" => ucwords($_POST["fatherPOB"]),
-      "father_address" => ucwords($_POST["fatherAddress"]),
-      "father_contact" => $_POST["fatherContact"],
-      "father_occupation" => ucwords($_POST["fatherOccupation"]),
-      "father_company_name" => ucwords($_POST["fatherCompany"]),
-      "mother_name" => ucwords($_POST["motherName"]),
-      "mother_date_of_birth" => $_POST["motherDOB"],
-      "mother_place_of_birth" => ucwords($_POST["motherPOB"]),
-      "mother_address" => ucwords($_POST["motherAddress"]),
-      "mother_contact" => $_POST["motherContact"],
-      "mother_occupation" => ucwords($_POST["motherOccupation"]),
-      "mother_company_name" => ucwords($_POST["motherCompany"]),
-    );
-
-    update("family", $familyData, "user_id", $userId);
-
-    // Siblings Data
-    if (count($_POST["siblingName"]) > 1) {
-      for ($i = 0; $i < count($_POST["siblingName"]); $i++) {
-        $siblingData = array(
-          "name" => ucwords($_POST["siblingName"][$i]),
-          "date_of_birth" => $_POST["siblingDOB"][$i],
-          "occupation" => ucwords($_POST["siblingOccupation"][$i]),
-          "company" => ucwords($_POST["siblingCompany"][$i]),
-        );
-
-        if ($_POST["siblingID"][$i] != "0") {
-          update("siblings", $siblingData, "sibling_id", $_POST["siblingID"][$i]);
-        } else {
-          $siblingData["user_id"] = $userId;
-          insert("siblings", $siblingData);
-        }
-      }
-    } else {
-      $siblingData = array(
-        "name" => ucwords($_POST["siblingName"][0]),
-        "date_of_birth" => $_POST["siblingDOB"][0],
-        "occupation" => ucwords($_POST["siblingOccupation"][0]),
-        "company" => ucwords($_POST["siblingCompany"][0]),
-      );
-
-      if ($_POST["siblingID"][0] != "0") {
-        update("siblings", $siblingData, "sibling_id", $_POST["siblingID"][0]);
-      } else {
-        $siblingData["user_id"] = $userId;
-        insert("siblings", $siblingData);
-      }
-    }
-
-    // Education Data
-    if (count($_POST["educationLevel"]) > 1) {
-      for ($i = 0; $i < count($_POST["educationLevel"]); $i++) {
-        $educationData = array(
-          "education_level" => ucwords($_POST["educationLevel"][$i]),
-          "course_taken" => ucwords($_POST["educationCourse"][$i]),
-          "name_of_school" => ucwords($_POST["educationSchoolName"][$i]),
-          "address" => ucwords($_POST["educationAddress"][$i]),
-          "year_completed" => $_POST["yearCompleted"][$i],
-        );
-
-        if ($_POST["educationID"][$i] != "0") {
-          update("education", $educationData, "education_id", $_POST["educationID"][$i]);
-        } else {
-          $educationData["user_id"] = $userId;
-          insert("education", $educationData);
-        }
-      }
-    } else {
-      $educationData = array(
-        "education_level" => ucwords($_POST["educationLevel"][0]),
-        "course_taken" => ucwords($_POST["educationCourse"][0]),
-        "name_of_school" => ucwords($_POST["educationSchoolName"][0]),
-        "address" => ucwords($_POST["educationAddress"][0]),
-        "year_completed" => $_POST["yearCompleted"][0],
-      );
-
-      if ($_POST["educationID"][0] != "0") {
-        update("education", $educationData, "education_id", $_POST["educationID"][0]);
-      } else {
-        $educationData["user_id"] = $userId;
-        insert("education", $educationData);
-      }
-    }
-
-    $response["success"] = true;
-    $response["message"] = "User has been updated successfully";
   } else {
     $response["success"] = false;
-    $response["message"] = mysqli_error($conn);
+    $response["message"] = "Email already exist.<br>Please try other email.";
   }
 
   returnResponse($response);
@@ -568,6 +665,7 @@ function login()
 
       if ($user->role == "admin") {
         $response["isNew"] = $user->isNew;
+        insertActivity("'" . getFullName($user->id, "with_email") . "' <strong>Logged in</strong>.", $user->id);
       }
     } else {
       $response["success"] = false;
@@ -585,6 +683,7 @@ function login()
 function logout()
 {
   global $_SESSION;
+  insertActivity("'" . getFullName($_SESSION['userId'], "with_email") . "' <strong>Logged out</strong>.", $_SESSION['userId']);
   $_SESSION = array();
 
   if (ini_get("session.use_cookies")) {
