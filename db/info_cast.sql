@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 23, 2023 at 08:21 AM
+-- Generation Time: Aug 30, 2023 at 03:23 PM
 -- Server version: 10.4.27-MariaDB
 -- PHP Version: 8.0.25
 
@@ -67,7 +67,22 @@ INSERT INTO `activity` (`activity_id`, `user_id`, `action`, `created_at`) VALUES
 (35, 11, '\'Test Test Tst\' <strong>Logged out</strong>.', '2023-07-23 06:18:43'),
 (36, 1, '\'Admin Admin\' <strong>Logged in</strong>.', '2023-07-23 06:18:52'),
 (37, 1, '<strong>Turned OFF</strong> Teacher registration.', '2023-07-23 06:19:21'),
-(38, 1, '<strong>Turned ON</strong> Teacher registration.', '2023-07-23 06:19:32');
+(38, 1, '<strong>Turned ON</strong> Teacher registration.', '2023-07-23 06:19:32'),
+(39, 1, '\'Admin Admin\' <strong>Logged out</strong>.', '2023-07-23 07:07:56'),
+(40, 1, '\'Admin Admin\' <strong>Logged in</strong>.', '2023-07-23 07:08:03'),
+(41, 1, '<strong>Added new admin:</strong> \'Test Test Test\'.', '2023-07-23 07:08:56'),
+(42, 1, '\'Admin Admin\' <strong>Logged out</strong>.', '2023-07-23 07:09:13'),
+(43, 12, '\'Test Test Test\' <strong>Logged in</strong>.', '2023-07-23 07:09:23'),
+(44, 12, '\'Test Test Test\' <strong>Logged out</strong>.', '2023-07-23 07:09:45'),
+(45, 12, '\'Test Test Test\' <strong>Logged in</strong>.', '2023-07-23 07:09:52'),
+(46, 12, '<strong>Decline</strong> \'Test Test Tst\' verification.', '2023-07-23 07:15:00'),
+(47, 12, '<strong>Decline</strong> \'Test Test Tst\' verification.', '2023-07-23 07:18:34'),
+(48, 12, '<strong>Approve</strong> \'Test Test Tst\' verification.', '2023-07-23 07:27:51'),
+(49, 12, 'Set [\'Test Test Tst\'] to alumni', '2023-07-23 07:28:54'),
+(50, 1, '\'Admin Admin\' <strong>Logged in</strong>.', '2023-07-23 07:30:17'),
+(51, 1, '\'Admin Admin\' <strong>Logged out</strong>.', '2023-07-23 07:30:20'),
+(52, 1, '\'Admin Admin\' <strong>Logged in</strong>.', '2023-08-30 10:24:04'),
+(53, 1, '\'Admin Admin\' <strong>Logged in</strong>.', '2023-08-30 12:57:14');
 
 -- --------------------------------------------------------
 
@@ -112,7 +127,10 @@ CREATE TABLE `notification` (
 
 INSERT INTO `notification` (`notification_id`, `created_by`, `user_id`, `content`, `created_at`) VALUES
 (1, 1, 11, 'Your account verification was declined by the Admin.', '2023-07-23 04:08:48'),
-(2, 1, 11, 'Your account verification was declined by the Admin.', '2023-07-23 04:20:31');
+(2, 1, 11, 'Your account verification was declined by the Admin.', '2023-07-23 04:20:31'),
+(3, 12, 11, 'Your account verification was declined by the Admin.', '2023-07-23 07:15:00'),
+(4, 12, 11, 'Your account verification was declined by the Admin.', '2023-07-23 07:18:34'),
+(5, 12, 11, 'Your account verification was approved by the Admin.', '2023-07-23 07:27:51');
 
 -- --------------------------------------------------------
 
@@ -169,7 +187,8 @@ INSERT INTO `users` (`id`, `fname`, `mname`, `lname`, `course_id`, `year`, `sect
 (8, 'Test', 'Test', 'Test', NULL, NULL, NULL, NULL, 'montemar@gmail.com', '098765432', 'admin', '07072023-011404_5996c14479318.jpg', '$argon2i$v=19$m=65536,t=4,p=1$RWhEQkxmTDhZaDFvWXJ3cg$MJT7M5t9H4zntYiiUXP1Aqw3UkFQd/+qnyzrzw6U91Q', 0, '2023-07-20 00:30:53', NULL, NULL, NULL),
 (9, 'Test', 'Test', 'Test', 1, NULL, NULL, NULL, 'test@test.com', '0987654321', 'teacher', NULL, '$argon2i$v=19$m=65536,t=4,p=1$TlRPUi5Cak8ySjdDaUtBWQ$x3cB6DE/qqJ+QGwx0Deh74orvuubsb37CuK6Rt8nzAA', 0, '2023-07-19 23:56:50', NULL, NULL, NULL),
 (10, 'Awd', 'Awd', 'Awd', NULL, NULL, NULL, NULL, 'test1@email.com', '0987654321', 'admin', NULL, '$argon2i$v=19$m=65536,t=4,p=1$TWlkTmw3QVRSUndFeWhjWQ$at98xOL9kPyQV4Opqhi0K/nQjURQKG5Nfsf3iDIpQJo', 0, '2023-07-20 14:40:19', NULL, NULL, NULL),
-(11, 'Test', 'Test', 'Tst', 1, 4, 'B', '2022-23', 'test_student@gmail.com', '0987654321', 'student', NULL, '$argon2i$v=19$m=65536,t=4,p=1$RWlqQmhkZGUzRTVwOTRKTw$JY8Pw8dS+xexa16m6zcE/3f6qroRPM65csW2MN2XJCg', 0, '2023-07-23 04:20:31', NULL, 3, '07232023-122012_lockscreen.jpg');
+(11, 'Test', 'Test', 'Tst', 1, 4, 'B', '2022-23', 'test_student@gmail.com', '0987654321', 'student', NULL, '$argon2i$v=19$m=65536,t=4,p=1$RWlqQmhkZGUzRTVwOTRKTw$JY8Pw8dS+xexa16m6zcE/3f6qroRPM65csW2MN2XJCg', 0, '2023-08-12 03:16:16', '2023-07-23', 1, '07232023-032746_Screenshot (1).png'),
+(12, 'Test', 'Test', 'Test', NULL, NULL, NULL, NULL, 'testadmin@gmail.com', '09876543', 'admin', NULL, '$argon2i$v=19$m=65536,t=4,p=1$TEUxY2pCTjAuNHVWZkxwVQ$J2nmrfOg2i3rxpPTDnLyc76tWWvmaiTOncE7QUnSY9U', 0, '2023-07-23 07:10:38', NULL, NULL, NULL);
 
 --
 -- Indexes for dumped tables
@@ -214,7 +233,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity`
 --
 ALTER TABLE `activity`
-  MODIFY `activity_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+  MODIFY `activity_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
 
 --
 -- AUTO_INCREMENT for table `course`
@@ -226,7 +245,7 @@ ALTER TABLE `course`
 -- AUTO_INCREMENT for table `notification`
 --
 ALTER TABLE `notification`
-  MODIFY `notification_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `notification_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `settings`
@@ -238,7 +257,7 @@ ALTER TABLE `settings`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- Constraints for dumped tables
