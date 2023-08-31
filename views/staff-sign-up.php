@@ -54,7 +54,7 @@ $isOpenRegistration = $getSetting[0]->teacher_reg == "1" ? true : false;
                         <div class="col-md-6">
                           <div class="form-group">
                             <label>Course</label>
-                            <select name="course_id" class=" form-control" required>
+                            <select name="course_id" class=" form-control">
                               <option value="" selected disabled>-- Select Course --</option>
                               <?php
                               $getCourseData = getTableData("course");
@@ -159,6 +159,7 @@ $isOpenRegistration = $getSetting[0]->teacher_reg == "1" ? true : false;
   <?php include("../components/scripts.php") ?>
 </body>
 <script>
+
   $("#clear").hide()
   $("#checkShow").on("click", function() {
     if ($(this).prop("checked")) {
@@ -172,7 +173,7 @@ $isOpenRegistration = $getSetting[0]->teacher_reg == "1" ? true : false;
     e.preventDefault()
     swal.showLoading()
 
-    const backendLoc = createBackendUrl("create_teacher_account")
+    const backendLoc = createBackendUrl("create_staff_account")
 
     $.ajax({
       url: backendLoc,

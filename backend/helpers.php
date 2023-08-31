@@ -17,6 +17,27 @@ $inputIsClearedName = "imgIsCleared";
 
 $SERVER_NAME = "";
 
+function sendSms() {
+  
+}
+
+function get_enum_values($table, $field)
+{
+  global $conn;
+
+  $type = mysqli_fetch_object(
+    mysqli_query(
+      $conn,
+      "SHOW COLUMNS FROM {$table} WHERE Field = '{$field}'"
+    )
+  )->Type;
+
+  preg_match("/^enum\(\'(.*)\'\)$/", $type, $matches);
+  $enum = explode("','", $matches[1]);
+  sort($enum);
+  return $enum;
+}
+
 if (inWhiteList($_SERVER['REMOTE_ADDR'])) {
   $SERVER_NAME = ($ORIGIN . $PATH);
 } else {

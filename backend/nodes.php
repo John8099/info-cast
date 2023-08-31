@@ -46,8 +46,8 @@ if (isset($_GET['action'])) {
       case "create_student_account":
         create_student_account();
         break;
-      case "create_teacher_account":
-        create_teacher_account();
+      case "create_staff_account":
+        create_staff_account();
         break;
       case "add_course":
         add_course();
@@ -67,6 +67,12 @@ if (isset($_GET['action'])) {
       case "verify_account":
         verify_account();
         break;
+      case "new_announcement":
+        new_announcement();
+        break;
+      case "edit_announcement":
+        edit_announcement();
+        break;
       default:
         null;
         break;
@@ -75,6 +81,101 @@ if (isset($_GET['action'])) {
     $response["success"] = false;
     $response["message"] = $e->getMessage();
   }
+}
+
+function edit_announcement()
+{
+  global $conn, $_POST;
+
+  $id = $_POST["id"];
+
+  $title = $_POST["title"];
+  $announce_type = $_POST["announce_type"];
+  $notify_to = count($_POST["notify_to"]) > 1 ? implode(", ", $_POST["notify_to"]) : $_POST["notify_to"][0];
+  $course_id = isset($_POST["course_id"]) ? $_POST["course_id"] : null;
+  $announcement = $_POST["announcement"];
+
+  $announceData = array(
+    "course_id" => $course_id,
+    "title" => $title,
+    "announce_type" => $announce_type,
+    "notified_to" => $notify_to,
+    "announcement" => mysqli_escape_string($conn, nl2br($announcement))
+  );
+
+  // Need SMS Notif sms(announcements)
+
+  $announceIn = update("announcements", $announceData, "id", $id);
+
+  if ($announceIn) {
+    $response["success"] = true;
+    $response["message"] = "Announcement successfully edited and broadcast.";
+  } else {
+    $response["success"] = false;
+    $response["message"] = mysqli_error($conn);
+  }
+
+  returnResponse($response);
+}
+
+function new_announcement()
+{
+  global $conn, $_POST;
+
+  $title = $_POST["title"];
+  $announce_type = $_POST["announce_type"];
+  $notify_to = count($_POST["notify_to"]) > 1 ? implode(", ", $_POST["notify_to"]) : $_POST["notify_to"][0];
+  $course_id = isset($_POST["course_id"]) ? $_POST["course_id"] : null;
+  $announcement = $_POST["announcement"];
+
+  $announceData = array(
+    "course_id" => $course_id,
+    "title" => $title,
+    "announce_type" => $announce_type,
+    "notified_to" => $notify_to,
+    "announcement" => mysqli_escape_string($conn, nl2br($announcement))
+  );
+
+  // SMS Notif sms(announcements)
+
+
+  $qStr = "";
+
+  if (count($_POST["notify_to"]) > 1) {
+    $inStr = array();
+    foreach ($_POST["notify_to"] as $n) {
+      array_push($inStr, "\"$n\"");
+    }
+
+    $qStr = "role IN (" . implode(',', $inStr) . ")";
+  } else {
+    $qStr = "role = '$notify_to'";
+  }
+
+  $toNotifyData = getTableWithWhere("users", $qStr);
+
+  foreach ($toNotifyData as $data) {
+    if ($data->course_id == $course_id || $data->course_id == null) {
+      $contact = $data->contact;
+
+      $announceTxt = ($title . ": ");
+      $announceTxt .= $announcement;
+
+      sendSms();
+    }
+  }
+
+  $announceIn = insert("announcements", $announceData);
+
+  if ($announceIn) {
+    $response["success"] = true;
+    $response["message"] = "Announcement successfully broadcast.";
+  } else {
+    $response["success"] = false;
+    $response["message"] = mysqli_error($conn);
+  }
+
+  returnResponse($response);
 }
 
 function verify_account()
@@ -134,7 +235,7 @@ function verify_student()
   if ($update) {
     $response["success"] = true;
     $response["message"] = ("Successfully $action" . "d student verification.");
-    
+
     $notification_content = ("Your account verification was $action" . "d by the Admin.");
     add_notification($_SESSION["userId"], $student_id, $notification_content);
 
@@ -318,14 +419,14 @@ function add_course()
   returnResponse($response);
 }
 
-function create_teacher_account()
+function create_staff_account()
 {
   global $conn, $_FILES, $_POST;
 
   $fname = $_POST["fname"];
   $mname = $_POST["mname"];
   $lname = $_POST["lname"];
-  $course_id = $_POST["course_id"];
+  $course_id = isset($_POST["course_id"]) ? $_POST["course_id"] : null;
   $contact = $_POST["contact"];
   $email = $_POST["email"];
   $password = $_POST["password"];
@@ -344,7 +445,7 @@ function create_teacher_account()
       "course_id" => $course_id,
       "email" => $email,
       "contact" => $contact,
-      "role" => "teacher",
+      "role" => $course_id ? "teacher" : "staff",
       "avatar" => $avatar,
       "password" => password_hash($password, PASSWORD_ARGON2I),
       "is_verified" => "1"

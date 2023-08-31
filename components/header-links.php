@@ -8,6 +8,9 @@
 
 <link rel="shortcut icon" href="<?= $SERVER_NAME ?>/public/favicon.png" />
 
+<link href="<?= $SERVER_NAME ?>/assets/vendors/select2/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="<?= $SERVER_NAME ?>/assets/vendors/select2-bootstrap-theme/select2-bootstrap.min.css">
+
 <?php if (is_connected()) : ?>
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css">
   <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.bootstrap4.min.css">
@@ -20,6 +23,7 @@
 
   <link rel=" stylesheet" href="https://cdn.datatables.net/responsive/2.4.1/css/responsive.bootstrap4.min.css">
 <?php else : ?>
+
   <link rel="stylesheet" href="<?= $SERVER_NAME ?>/assets/vendors/dataTables/css/dataTables.bootstrap4.min.css">
   <link rel="stylesheet" href="<?= $SERVER_NAME ?>/assets/vendors/dataTables/css/buttons.bootstrap4.min.css">
   <link rel="stylesheet" href="<?= $SERVER_NAME ?>/assets/vendors/dataTables/css/buttons.dataTables.min.css">

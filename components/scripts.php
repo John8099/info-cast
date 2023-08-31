@@ -10,6 +10,7 @@
 
 <script src="<?= $SERVER_NAME ?>/assets/vendors/sweetalert/sweetalert2.all.min.js"></script>
 
+<script src="<?= $SERVER_NAME ?>/assets/vendors/select2/select2.min.js"></script>
 <?php if (is_connected()) : ?>
   <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
   <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
@@ -29,6 +30,8 @@
   <script src="https://cdn.datatables.net/datetime/1.4.1/js/dataTables.dateTime.min.js"></script>
 
   <script src="https://cdn.datatables.net/select/1.7.0/js/dataTables.select.min.js"></script>
+
+
 <?php else : ?>
   <script src="<?= $SERVER_NAME ?>/assets/vendors/dataTables/js/jquery.dataTables.min.js"></script>
   <script src="<?= $SERVER_NAME ?>/assets/vendors/dataTables/js/dataTables.bootstrap4.min.js"></script>

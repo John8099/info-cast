@@ -131,3 +131,10 @@ window.previewFile = function (input, imgDisplayId, divClearId, divBrowseId) {
     // $(divClearId).show();
   }
 };
+
+$("[required]")
+  .parent()
+  .each(function () {
+    const asterisk = ` <span class="text-danger">*</span>`;
+    $(this).closest('.form-group').find("label").append(asterisk);
+  });

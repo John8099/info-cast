@@ -54,38 +54,60 @@ if (!$isLogin) {
                             <?= generateImgUpload($user->id) ?>
                           </div>
 
-                          <div class="row mb-3">
-                            <label class="col-md-4 col-lg-3 col-form-label">First name</label>
-                            <div class="col-md-8 col-lg-9">
-                              <input name="fname" type="text" class="form-control" value="<?= $user->fname ?>" required>
+                          <div class="form-group mb-3">
+                            <div class="row">
+                              <label class="col-md-4 col-lg-3 col-form-label pb-0">First name</label>
+                              <div class="col-md-8 col-lg-9">
+                                <input name="fname" type="text" class="form-control" value="<?= $user->fname ?>" required>
+                              </div>
                             </div>
                           </div>
 
-                          <div class="row mb-3">
-                            <label class="col-md-4 col-lg-3 col-form-label">Middle name</label>
-                            <div class="col-md-8 col-lg-9">
-                              <input name="mname" type="text" class="form-control" value="<?= $user->mname ?>">
+                          <div class="form-group mb-3">
+                            <div class="row ">
+                              <label class="col-md-4 col-lg-3 col-form-label pb-0">Middle name</label>
+                              <div class="col-md-8 col-lg-9">
+                                <input name="mname" type="text" class="form-control" value="<?= $user->mname ?>">
+                              </div>
                             </div>
                           </div>
 
-                          <div class="row mb-3">
-                            <label class="col-md-4 col-lg-3 col-form-label">Last name</label>
-                            <div class="col-md-8 col-lg-9">
-                              <input name="lname" type="text" class="form-control" value="<?= $user->lname ?>" required>
+                          <div class="form-group mb-3">
+                            <div class="row">
+                              <label class="col-md-4 col-lg-3 col-form-label pb-0">Last name</label>
+                              <div class="col-md-8 col-lg-9">
+                                <input name="lname" type="text" class="form-control" value="<?= $user->lname ?>" required>
+                              </div>
                             </div>
                           </div>
 
-                          <div class="row mb-3">
-                            <label class="col-md-4 col-lg-3 col-form-label">Email</label>
-                            <div class="col-md-8 col-lg-9">
-                              <input name="email" type="email" class="form-control" value="<?= $user->email ?>" required>
+                          <?php if ($user->course_id) : ?>
+                            <div class="form-group mb-3">
+                              <div class="row">
+                                <label class="col-md-4 col-lg-3 col-form-label pb-0">Course</label>
+                                <div class="col-md-8 col-lg-9">
+                                  <?php $courseData = getTableSingleDataById("course", "course_id", $user->course_id); ?>
+                                  <input type="text" class="form-control" value="<?= "($courseData->acronym) $courseData->name" ?>" readonly>
+                                </div>
+                              </div>
+                            </div>
+                          <?php endif; ?>
+
+                          <div class="form-group mb-3">
+                            <div class="row ">
+                              <label class="col-md-4 col-lg-3 col-form-label pb-0">Email</label>
+                              <div class="col-md-8 col-lg-9">
+                                <input name="email" type="email" class="form-control" value="<?= $user->email ?>" required>
+                              </div>
                             </div>
                           </div>
 
-                          <div class="row mb-3">
-                            <label class="col-md-4 col-lg-3 col-form-label">Contact</label>
-                            <div class="col-md-8 col-lg-9">
-                              <input name="contact" type="text" class="form-control" value="<?= $user->contact ?>" required>
+                          <div class="form-group mb-3">
+                            <div class="row">
+                              <label class="col-md-4 col-lg-3 col-form-label pb-0">Contact</label>
+                              <div class="col-md-8 col-lg-9">
+                                <input name="contact" type="text" class="form-control" value="<?= $user->contact ?>" required>
+                              </div>
                             </div>
                           </div>
 

@@ -50,7 +50,7 @@ if (!$isLogin) {
                         <div class="col-md-4">
                           <div class="form-group">
                             <label>Last name</label>
-                            <input type="text" class="form-control" name="lname" placeholder="Last name">
+                            <input type="text" class="form-control" name="lname" placeholder="Last name" required>
                           </div>
                         </div>
                       </div>

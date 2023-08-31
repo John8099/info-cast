@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.0
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 30, 2023 at 03:23 PM
--- Server version: 10.4.27-MariaDB
--- PHP Version: 8.0.25
+-- Generation Time: Aug 31, 2023 at 09:52 AM
+-- Server version: 10.4.28-MariaDB
+-- PHP Version: 8.2.4
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -82,7 +82,43 @@ INSERT INTO `activity` (`activity_id`, `user_id`, `action`, `created_at`) VALUES
 (50, 1, '\'Admin Admin\' <strong>Logged in</strong>.', '2023-07-23 07:30:17'),
 (51, 1, '\'Admin Admin\' <strong>Logged out</strong>.', '2023-07-23 07:30:20'),
 (52, 1, '\'Admin Admin\' <strong>Logged in</strong>.', '2023-08-30 10:24:04'),
-(53, 1, '\'Admin Admin\' <strong>Logged in</strong>.', '2023-08-30 12:57:14');
+(53, 1, '\'Admin Admin\' <strong>Logged in</strong>.', '2023-08-30 12:57:14'),
+(54, 1, '\'Admin Admin\' <strong>Logged in</strong>.', '2023-08-30 23:35:15'),
+(55, 1, '\'Admin Admin\' <strong>Logged out</strong>.', '2023-08-30 23:49:48'),
+(56, 1, '\'Admin Admin\' <strong>Logged in</strong>.', '2023-08-30 23:50:09'),
+(57, 1, '\'Admin Admin\' <strong>Logged out</strong>.', '2023-08-31 01:10:04'),
+(58, 1, '\'Admin Admin\' <strong>Logged in</strong>.', '2023-08-31 01:10:30'),
+(59, 1, '\'Admin Admin\' <strong>Logged in</strong>.', '2023-08-31 03:25:42'),
+(60, 1, '\'Admin Admin\' <strong>Logged out</strong>.', '2023-08-31 03:25:45'),
+(61, 6, '\'Awd Awd Awd\' <strong>Logged out</strong>.', '2023-08-31 03:44:12'),
+(62, 13, '\'Test Test Test\' <strong>Logged out</strong>.', '2023-08-31 04:25:37'),
+(63, 9, '\'Test Test Test\' <strong>Logged out</strong>.', '2023-08-31 04:27:29');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `announcements`
+--
+
+CREATE TABLE `announcements` (
+  `id` int(11) NOT NULL,
+  `course_id` int(11) DEFAULT NULL,
+  `title` text NOT NULL,
+  `announce_type` enum('info','event','cancellation') NOT NULL,
+  `notified_to` varchar(32) NOT NULL COMMENT 'students, staffs, teacher, alumni, all',
+  `announcement` text NOT NULL,
+  `date_created` timestamp NOT NULL DEFAULT current_timestamp(),
+  `deleted` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `announcements`
+--
+
+INSERT INTO `announcements` (`id`, `course_id`, `title`, `announce_type`, `notified_to`, `announcement`, `date_created`, `deleted`) VALUES
+(1, 1, 'test', 'cancellation', 'alumni, teacher', 'test', '2023-08-31 01:24:43', 0),
+(2, NULL, 'Sample Event', 'event', 'staff, student, teacher', 'This is an event', '2023-08-31 03:01:04', 0),
+(3, 2, 'Test info', 'info', 'alumni', 'Test announce', '2023-08-31 03:14:20', 0);
 
 -- --------------------------------------------------------
 
@@ -167,7 +203,7 @@ CREATE TABLE `users` (
   `sy` varchar(32) DEFAULT NULL,
   `email` varchar(250) NOT NULL,
   `contact` varchar(32) DEFAULT NULL,
-  `role` enum('student','teacher','admin','alumni') NOT NULL,
+  `role` enum('student','teacher','admin','alumni','staff') NOT NULL,
   `avatar` varchar(250) DEFAULT NULL,
   `password` varchar(500) DEFAULT NULL,
   `isNew` tinyint(1) NOT NULL DEFAULT 0,
@@ -185,10 +221,11 @@ INSERT INTO `users` (`id`, `fname`, `mname`, `lname`, `course_id`, `year`, `sect
 (1, 'Admin', NULL, 'Admin', NULL, NULL, NULL, NULL, 'admin@admin.com', '09876543', 'admin', NULL, '$argon2i$v=19$m=65536,t=4,p=1$RUZKYi8vdEZPZTIzRGJlSQ$nu99vTpWpkgmgcqbXBHo9g07+JvQLrCuupNq0t3Kkw4', 0, '2023-07-22 10:50:30', NULL, NULL, NULL),
 (6, 'Awd', 'Awd', 'Awd', 1, 4, 'A', '2022-23', 'test@email.com', '0987654321', 'alumni', NULL, '$argon2i$v=19$m=65536,t=4,p=1$a0NtSkRjYzJkRHVOY3I4Yw$+a7zA6nspFN8UYUhL8IyYN254aqwbjpLBF4AiY6/9wY', 0, '2023-07-21 03:39:22', '2023-07-07', 2, NULL),
 (8, 'Test', 'Test', 'Test', NULL, NULL, NULL, NULL, 'montemar@gmail.com', '098765432', 'admin', '07072023-011404_5996c14479318.jpg', '$argon2i$v=19$m=65536,t=4,p=1$RWhEQkxmTDhZaDFvWXJ3cg$MJT7M5t9H4zntYiiUXP1Aqw3UkFQd/+qnyzrzw6U91Q', 0, '2023-07-20 00:30:53', NULL, NULL, NULL),
-(9, 'Test', 'Test', 'Test', 1, NULL, NULL, NULL, 'test@test.com', '0987654321', 'teacher', NULL, '$argon2i$v=19$m=65536,t=4,p=1$TlRPUi5Cak8ySjdDaUtBWQ$x3cB6DE/qqJ+QGwx0Deh74orvuubsb37CuK6Rt8nzAA', 0, '2023-07-19 23:56:50', NULL, NULL, NULL),
+(9, 'Test', 'Test', 'Test', 2, NULL, NULL, NULL, 'test@test.com', '0987654321', 'teacher', NULL, '$argon2i$v=19$m=65536,t=4,p=1$TlRPUi5Cak8ySjdDaUtBWQ$x3cB6DE/qqJ+QGwx0Deh74orvuubsb37CuK6Rt8nzAA', 0, '2023-08-31 04:26:51', NULL, NULL, NULL),
 (10, 'Awd', 'Awd', 'Awd', NULL, NULL, NULL, NULL, 'test1@email.com', '0987654321', 'admin', NULL, '$argon2i$v=19$m=65536,t=4,p=1$TWlkTmw3QVRSUndFeWhjWQ$at98xOL9kPyQV4Opqhi0K/nQjURQKG5Nfsf3iDIpQJo', 0, '2023-07-20 14:40:19', NULL, NULL, NULL),
 (11, 'Test', 'Test', 'Tst', 1, 4, 'B', '2022-23', 'test_student@gmail.com', '0987654321', 'student', NULL, '$argon2i$v=19$m=65536,t=4,p=1$RWlqQmhkZGUzRTVwOTRKTw$JY8Pw8dS+xexa16m6zcE/3f6qroRPM65csW2MN2XJCg', 0, '2023-08-12 03:16:16', '2023-07-23', 1, '07232023-032746_Screenshot (1).png'),
-(12, 'Test', 'Test', 'Test', NULL, NULL, NULL, NULL, 'testadmin@gmail.com', '09876543', 'admin', NULL, '$argon2i$v=19$m=65536,t=4,p=1$TEUxY2pCTjAuNHVWZkxwVQ$J2nmrfOg2i3rxpPTDnLyc76tWWvmaiTOncE7QUnSY9U', 0, '2023-07-23 07:10:38', NULL, NULL, NULL);
+(12, 'Test', 'Test', 'Test', NULL, NULL, NULL, NULL, 'testadmin@gmail.com', '09876543', 'admin', NULL, '$argon2i$v=19$m=65536,t=4,p=1$TEUxY2pCTjAuNHVWZkxwVQ$J2nmrfOg2i3rxpPTDnLyc76tWWvmaiTOncE7QUnSY9U', 0, '2023-07-23 07:10:38', NULL, NULL, NULL),
+(13, 'Test', 'Test', 'Test', 1, 4, 'A', '2022-23', 'user@gmail.com', '098653', 'student', NULL, '$argon2i$v=19$m=65536,t=4,p=1$clVpd0ppZDJ5NUN3cW9JMw$GB2+AoLLjYbj+ZUQYD8sCzsNUaYtuE/RF+uMwIRM5Vg', 0, '2023-08-31 03:44:40', NULL, 0, NULL);
 
 --
 -- Indexes for dumped tables
@@ -199,6 +236,12 @@ INSERT INTO `users` (`id`, `fname`, `mname`, `lname`, `course_id`, `year`, `sect
 --
 ALTER TABLE `activity`
   ADD PRIMARY KEY (`activity_id`);
+
+--
+-- Indexes for table `announcements`
+--
+ALTER TABLE `announcements`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `course`
@@ -233,7 +276,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity`
 --
 ALTER TABLE `activity`
-  MODIFY `activity_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
+  MODIFY `activity_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
+
+--
+-- AUTO_INCREMENT for table `announcements`
+--
+ALTER TABLE `announcements`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `course`
@@ -257,7 +306,7 @@ ALTER TABLE `settings`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- Constraints for dumped tables
