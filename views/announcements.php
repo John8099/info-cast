@@ -15,6 +15,7 @@ if (!$isLogin) {
 <body>
   <div class="container-scroller">
     <?php
+    // sendSms();
     if ($user) {
       if ($user->role == "admin") {
         include("../components/admin-menu.php");

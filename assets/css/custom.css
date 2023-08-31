@@ -129,6 +129,7 @@ thead th {
   line-height: 32px;
   padding-right: 33px;
   padding: 0 1rem;
+  width: 100%;
 }
 
 .select2.select2-container .select2-selection .select2-selection__arrow {
@@ -245,4 +246,8 @@ thead th {
   ul
   .select2-results__option--highlighted[aria-selected] {
   background-color: #3498db;
+}
+
+.select2 .select2-container .select2-container--default{
+  width: 100% !important;
 }

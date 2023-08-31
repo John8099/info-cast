@@ -103,7 +103,33 @@ function edit_announcement()
     "announcement" => mysqli_escape_string($conn, nl2br($announcement))
   );
 
-  // Need SMS Notif sms(announcements)
+  // SMS Notif sms(announcements)
+
+  $qStr = "";
+
+  if (count($_POST["notify_to"]) > 1) {
+    $inStr = array();
+    foreach ($_POST["notify_to"] as $n) {
+      array_push($inStr, "\"$n\"");
+    }
+
+    $qStr = "role IN (" . implode(',', $inStr) . ")";
+  } else {
+    $qStr = "role = '$notify_to'";
+  }
+
+  $toNotifyData = getTableWithWhere("users", $qStr);
+
+  foreach ($toNotifyData as $data) {
+    if ($data->course_id == $course_id || $data->course_id == null) {
+      $contact = $data->contact;
+
+      $announceTxt = ($title . ": ");
+      $announceTxt .= $announcement;
+
+      sendSms($contact);
+    }
+  }
 
   $announceIn = update("announcements", $announceData, "id", $id);
 
@@ -138,7 +164,6 @@ function new_announcement()
 
   // SMS Notif sms(announcements)
 
-
   $qStr = "";
 
   if (count($_POST["notify_to"]) > 1) {
@@ -161,7 +186,7 @@ function new_announcement()
       $announceTxt = ($title . ": ");
       $announceTxt .= $announcement;
 
-      sendSms();
+      sendSms($contact);
     }
   }
 

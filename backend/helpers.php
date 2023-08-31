@@ -17,8 +17,69 @@ $inputIsClearedName = "imgIsCleared";
 
 $SERVER_NAME = "";
 
-function sendSms() {
-  
+function sendSms($c_number)
+{
+  require_once(__DIR__ . '/vendor/autoload.php');
+
+  // Configure HTTP basic authorization: BasicAuth
+  $config = ClickSend\Configuration::getDefaultConfiguration()
+    ->setUsername('dummywhat44@gmail.com')
+    ->setPassword('Dummy44what!');
+
+  $apiInstance = new ClickSend\Api\SMSApi(new GuzzleHttp\Client(), $config);
+  $msg = new \ClickSend\Model\SmsMessage();
+  $msg->setBody("This is send through info cast system");
+  $msg->setTo($c_number);
+  $msg->setSource("sdk");
+
+  // \ClickSend\Model\SmsMessageCollection | SmsMessageCollection model
+  $sms_messages = new \ClickSend\Model\SmsMessageCollection();
+  $sms_messages->setMessages([$msg]);
+
+  try {
+    $result = $apiInstance->smsSendPost($sms_messages);
+    returnResponse($result);
+  } catch (Exception $e) {
+    echo 'Exception when calling SMSApi->smsSendPost: ', $e->getMessage(), PHP_EOL;
+  }
+  // $curl = curl_init();
+
+  // curl_setopt_array($curl, [
+  //   CURLOPT_URL => "https://control.msg91.com/api/v5/flow/",
+  //   CURLOPT_RETURNTRANSFER => true,
+  //   CURLOPT_ENCODING => "",
+  //   CURLOPT_MAXREDIRS => 10,
+  //   CURLOPT_TIMEOUT => 30,
+  //   CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  //   CURLOPT_CUSTOMREQUEST => "POST",
+  //   CURLOPT_POSTFIELDS => json_encode([
+  //     'template_id' => 'EntertemplateID',
+  //     'short_url' => '1 (On) or 0 (Off)',
+  //     'recipients' => [
+  //       [
+  //         'mobiles' => '9279172745',
+  //         'VAR1' => 'VALUE1',
+  //         'VAR2' => 'VALUE2'
+  //       ]
+  //     ]
+  //   ]),
+  //   CURLOPT_HTTPHEADER => [
+  //     "accept: application/json",
+  //     "authkey: 404831ArEMazTTyd64f08589P1",
+  //     "content-type: application/json"
+  //   ],
+  // ]);
+
+  // $response = curl_exec($curl);
+  // $err = curl_error($curl);
+
+  // curl_close($curl);
+
+  // if ($err) {
+  //   echo "cURL Error #:" . $err;
+  // } else {
+  //   echo $response;
+  // }
 }
 
 function get_enum_values($table, $field)
