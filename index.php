@@ -19,7 +19,7 @@
                   <div class="brand-logo">
                     <img class="w-100" src="<?= $SERVER_NAME ?>/public/logo2.png" alt="logo">
                   </div>
-                 
+
                   <h3 class="text-center">Login you account</h3>
                   <form class="pt-3" method="POST" id="form-login">
                     <div class="input-group mb-2">
@@ -54,7 +54,7 @@
                       Don't have an account? <a href="./create-account" class="text-primary">Create</a>
                     </div>
                   </form>
-                  <?php password_hash("test", PASSWORD_ARGON2I) ?>
+                  <?php password_hash("test", PASSWORD_DEFAULT) ?>
                 </div>
               </div>
             </div>
@@ -113,7 +113,7 @@
           if (resp.role === "admin") {
             location += "admin/"
           } else {
-            location += "announcements"
+            location += "user/announcements"
           }
 
           window.location.replace(location)

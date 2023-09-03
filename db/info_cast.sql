@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 31, 2023 at 09:52 AM
+-- Generation Time: Sep 01, 2023 at 02:24 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -92,7 +92,15 @@ INSERT INTO `activity` (`activity_id`, `user_id`, `action`, `created_at`) VALUES
 (60, 1, '\'Admin Admin\' <strong>Logged out</strong>.', '2023-08-31 03:25:45'),
 (61, 6, '\'Awd Awd Awd\' <strong>Logged out</strong>.', '2023-08-31 03:44:12'),
 (62, 13, '\'Test Test Test\' <strong>Logged out</strong>.', '2023-08-31 04:25:37'),
-(63, 9, '\'Test Test Test\' <strong>Logged out</strong>.', '2023-08-31 04:27:29');
+(63, 9, '\'Test Test Test\' <strong>Logged out</strong>.', '2023-08-31 04:27:29'),
+(64, 1, '\'Admin Admin\' <strong>Logged out</strong>.', '2023-08-31 23:06:50'),
+(65, 8, '\'Test Test Test\' <strong>Logged in</strong>.', '2023-08-31 23:13:16'),
+(66, 8, '\'Test Test Test\' <strong>Logged out</strong>.', '2023-08-31 23:30:42'),
+(67, 1, '\'Admin Admin\' <strong>Logged in</strong>.', '2023-08-31 23:41:23'),
+(68, 1, '<strong>Decline</strong> \'Test Test Test\' verification.', '2023-08-31 23:45:02'),
+(69, 1, '<strong>Approve</strong> \'Test Test Test\' verification.', '2023-08-31 23:45:23'),
+(70, 13, '\'Test Test Test\' <strong>Logged out</strong>.', '2023-09-01 00:04:38'),
+(71, 1, '\'Admin Admin\' <strong>Logged in</strong>.', '2023-09-01 00:04:49');
 
 -- --------------------------------------------------------
 
@@ -166,7 +174,9 @@ INSERT INTO `notification` (`notification_id`, `created_by`, `user_id`, `content
 (2, 1, 11, 'Your account verification was declined by the Admin.', '2023-07-23 04:20:31'),
 (3, 12, 11, 'Your account verification was declined by the Admin.', '2023-07-23 07:15:00'),
 (4, 12, 11, 'Your account verification was declined by the Admin.', '2023-07-23 07:18:34'),
-(5, 12, 11, 'Your account verification was approved by the Admin.', '2023-07-23 07:27:51');
+(5, 12, 11, 'Your account verification was approved by the Admin.', '2023-07-23 07:27:51'),
+(6, 1, 13, 'Your account verification was declined by the Admin.', '2023-08-31 23:45:02'),
+(7, 1, 13, 'Your account verification was approved by the Admin.', '2023-08-31 23:45:23');
 
 -- --------------------------------------------------------
 
@@ -218,14 +228,14 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `fname`, `mname`, `lname`, `course_id`, `year`, `section`, `sy`, `email`, `contact`, `role`, `avatar`, `password`, `isNew`, `created_at`, `set_graduate_at`, `is_verified`, `verification_img`) VALUES
-(1, 'Admin', NULL, 'Admin', NULL, NULL, NULL, NULL, 'admin@admin.com', '09876543', 'admin', NULL, '$argon2i$v=19$m=65536,t=4,p=1$RUZKYi8vdEZPZTIzRGJlSQ$nu99vTpWpkgmgcqbXBHo9g07+JvQLrCuupNq0t3Kkw4', 0, '2023-07-22 10:50:30', NULL, NULL, NULL),
-(6, 'Awd', 'Awd', 'Awd', 1, 4, 'A', '2022-23', 'test@email.com', '0987654321', 'alumni', NULL, '$argon2i$v=19$m=65536,t=4,p=1$a0NtSkRjYzJkRHVOY3I4Yw$+a7zA6nspFN8UYUhL8IyYN254aqwbjpLBF4AiY6/9wY', 0, '2023-07-21 03:39:22', '2023-07-07', 2, NULL),
-(8, 'Test', 'Test', 'Test', NULL, NULL, NULL, NULL, 'montemar@gmail.com', '098765432', 'admin', '07072023-011404_5996c14479318.jpg', '$argon2i$v=19$m=65536,t=4,p=1$RWhEQkxmTDhZaDFvWXJ3cg$MJT7M5t9H4zntYiiUXP1Aqw3UkFQd/+qnyzrzw6U91Q', 0, '2023-07-20 00:30:53', NULL, NULL, NULL),
-(9, 'Test', 'Test', 'Test', 2, NULL, NULL, NULL, 'test@test.com', '0987654321', 'teacher', NULL, '$argon2i$v=19$m=65536,t=4,p=1$TlRPUi5Cak8ySjdDaUtBWQ$x3cB6DE/qqJ+QGwx0Deh74orvuubsb37CuK6Rt8nzAA', 0, '2023-08-31 04:26:51', NULL, NULL, NULL),
-(10, 'Awd', 'Awd', 'Awd', NULL, NULL, NULL, NULL, 'test1@email.com', '0987654321', 'admin', NULL, '$argon2i$v=19$m=65536,t=4,p=1$TWlkTmw3QVRSUndFeWhjWQ$at98xOL9kPyQV4Opqhi0K/nQjURQKG5Nfsf3iDIpQJo', 0, '2023-07-20 14:40:19', NULL, NULL, NULL),
-(11, 'Test', 'Test', 'Tst', 1, 4, 'B', '2022-23', 'test_student@gmail.com', '0987654321', 'student', NULL, '$argon2i$v=19$m=65536,t=4,p=1$RWlqQmhkZGUzRTVwOTRKTw$JY8Pw8dS+xexa16m6zcE/3f6qroRPM65csW2MN2XJCg', 0, '2023-08-12 03:16:16', '2023-07-23', 1, '07232023-032746_Screenshot (1).png'),
-(12, 'Test', 'Test', 'Test', NULL, NULL, NULL, NULL, 'testadmin@gmail.com', '09876543', 'admin', NULL, '$argon2i$v=19$m=65536,t=4,p=1$TEUxY2pCTjAuNHVWZkxwVQ$J2nmrfOg2i3rxpPTDnLyc76tWWvmaiTOncE7QUnSY9U', 0, '2023-07-23 07:10:38', NULL, NULL, NULL),
-(13, 'Test', 'Test', 'Test', 1, 4, 'A', '2022-23', 'user@gmail.com', '098653', 'student', NULL, '$argon2i$v=19$m=65536,t=4,p=1$clVpd0ppZDJ5NUN3cW9JMw$GB2+AoLLjYbj+ZUQYD8sCzsNUaYtuE/RF+uMwIRM5Vg', 0, '2023-08-31 03:44:40', NULL, 0, NULL);
+(1, 'Admin', NULL, 'Admin', NULL, NULL, NULL, NULL, 'admin@admin.com', '09876543', 'admin', NULL, '$2y$10$.mBuLOKN5axcBiZdfNzFP.BvBBoOQT1op6vznuYd3guDFCL4.LlY2', 0, '2023-09-01 00:21:43', NULL, NULL, NULL),
+(6, 'Awd', 'Awd', 'Awd', 1, 4, 'A', '2022-23', 'test@email.com', '0987654321', 'alumni', NULL, '$2y$10$.mBuLOKN5axcBiZdfNzFP.BvBBoOQT1op6vznuYd3guDFCL4.LlY2', 0, '2023-09-01 00:22:23', '2023-07-07', 2, NULL),
+(8, 'Test', 'Test', 'Test', NULL, NULL, NULL, NULL, 'montemar@gmail.com', '098765432', 'admin', '07072023-011404_5996c14479318.jpg', '$2y$10$.mBuLOKN5axcBiZdfNzFP.BvBBoOQT1op6vznuYd3guDFCL4.LlY2', 0, '2023-09-01 00:22:23', NULL, NULL, NULL),
+(9, 'Test', 'Test', 'Test', 2, NULL, NULL, NULL, 'test@test.com', '0987654321', 'teacher', NULL, '$2y$10$.mBuLOKN5axcBiZdfNzFP.BvBBoOQT1op6vznuYd3guDFCL4.LlY2', 0, '2023-09-01 00:22:23', NULL, NULL, NULL),
+(10, 'Awd', 'Awd', 'Awd', NULL, NULL, NULL, NULL, 'test1@email.com', '0987654321', 'admin', NULL, '$2y$10$.mBuLOKN5axcBiZdfNzFP.BvBBoOQT1op6vznuYd3guDFCL4.LlY2', 0, '2023-09-01 00:22:23', NULL, NULL, NULL),
+(11, 'Test', 'Test', 'Tst', 1, 4, 'B', '2022-23', 'test_student@gmail.com', '0987654321', 'student', NULL, '$2y$10$.mBuLOKN5axcBiZdfNzFP.BvBBoOQT1op6vznuYd3guDFCL4.LlY2', 0, '2023-09-01 00:22:23', '2023-07-23', 1, '07232023-032746_Screenshot (1).png'),
+(12, 'Test', 'Test', 'Test', NULL, NULL, NULL, NULL, 'testadmin@gmail.com', '09876543', 'admin', NULL, '$2y$10$.mBuLOKN5axcBiZdfNzFP.BvBBoOQT1op6vznuYd3guDFCL4.LlY2', 0, '2023-09-01 00:22:23', NULL, NULL, NULL),
+(13, 'Test', 'Test', 'Test', 1, 4, 'A', '2022-23', 'user@gmail.com', '098653', 'student', NULL, '$2y$10$.mBuLOKN5axcBiZdfNzFP.BvBBoOQT1op6vznuYd3guDFCL4.LlY2', 0, '2023-09-01 00:22:23', NULL, 2, '09012023-074515_5996c14479318.jpg');
 
 --
 -- Indexes for dumped tables
@@ -276,7 +286,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity`
 --
 ALTER TABLE `activity`
-  MODIFY `activity_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
+  MODIFY `activity_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=72;
 
 --
 -- AUTO_INCREMENT for table `announcements`
@@ -294,7 +304,7 @@ ALTER TABLE `course`
 -- AUTO_INCREMENT for table `notification`
 --
 ALTER TABLE `notification`
-  MODIFY `notification_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `notification_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `settings`

@@ -136,5 +136,23 @@ $("[required]")
   .parent()
   .each(function () {
     const asterisk = ` <span class="text-danger">*</span>`;
-    $(this).closest('.form-group').find("label").append(asterisk);
+    $(this).closest(".form-group").find("label").append(asterisk);
   });
+  
+$("#search_field").hideseek({
+  nodata: "No results found",
+});
+
+// const target = $('img[src="https://cdn.000webhost.com/000webhost/logo/footer-powered-by-000webhost-white2.png"]');
+// // if($target.length>0){
+// //     var $div=$target.parent().closest('div').remove();
+// // }
+// console.log(target)
+
+/* global PullToRefresh */
+PullToRefresh.init({
+  mainElement: '.content-wrapper',
+  onRefresh: function () {
+    window.location.reload();
+  },
+});

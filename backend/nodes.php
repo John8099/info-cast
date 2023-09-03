@@ -85,7 +85,7 @@ if (isset($_GET['action'])) {
 
 function edit_announcement()
 {
-  global $conn, $_POST;
+  global $conn, $_POST, $_SESSION;
 
   $id = $_POST["id"];
 
@@ -103,8 +103,8 @@ function edit_announcement()
     "announcement" => mysqli_escape_string($conn, nl2br($announcement))
   );
 
-  // SMS Notif sms(announcements)
-
+  $notification_content = "Edited <strong>announcement</strong>.";
+  // SMS Notif sms(announcements)  
   $qStr = "";
 
   if (count($_POST["notify_to"]) > 1) {
@@ -119,6 +119,7 @@ function edit_announcement()
   }
 
   $toNotifyData = getTableWithWhere("users", $qStr);
+  $message = "$title: $announcement";
 
   foreach ($toNotifyData as $data) {
     if ($data->course_id == $course_id || $data->course_id == null) {
@@ -127,13 +128,19 @@ function edit_announcement()
       $announceTxt = ($title . ": ");
       $announceTxt .= $announcement;
 
-      sendSms($contact);
+      add_notification($_SESSION["userId"], $data->id, $notification_content);
+      if ($contact) {
+        if (strlen($contact) == 11) {
+          sendSms($contact, $message);
+        }
+      }
     }
   }
 
   $announceIn = update("announcements", $announceData, "id", $id);
 
   if ($announceIn) {
+    insertActivity($notification_content, $_SESSION["userId"]);
     $response["success"] = true;
     $response["message"] = "Announcement successfully edited and broadcast.";
   } else {
@@ -146,7 +153,7 @@ function edit_announcement()
 
 function new_announcement()
 {
-  global $conn, $_POST;
+  global $conn, $_POST, $_SESSION;
 
   $title = $_POST["title"];
   $announce_type = $_POST["announce_type"];
@@ -161,9 +168,9 @@ function new_announcement()
     "notified_to" => $notify_to,
     "announcement" => mysqli_escape_string($conn, nl2br($announcement))
   );
+  $notification_content = "Posted <strong>New Announcement</strong>";
 
   // SMS Notif sms(announcements)
-
   $qStr = "";
 
   if (count($_POST["notify_to"]) > 1) {
@@ -179,20 +186,24 @@ function new_announcement()
 
   $toNotifyData = getTableWithWhere("users", $qStr);
 
+  $message = "$title: $announcement";
   foreach ($toNotifyData as $data) {
     if ($data->course_id == $course_id || $data->course_id == null) {
       $contact = $data->contact;
 
-      $announceTxt = ($title . ": ");
-      $announceTxt .= $announcement;
-
-      sendSms($contact);
+      add_notification($_SESSION["userId"], $data->id, $notification_content);
+      if ($contact) {
+        if (strlen($contact) == 11) {
+          sendSms($contact, $message);
+        }
+      }
     }
   }
 
   $announceIn = insert("announcements", $announceData);
 
   if ($announceIn) {
+    insertActivity("Posted <strong>New Announcement</strong>", $_SESSION["userId"]);
     $response["success"] = true;
     $response["message"] = "Announcement successfully broadcast.";
   } else {
@@ -457,33 +468,39 @@ function create_staff_account()
   $password = $_POST["password"];
 
   if (!checkEmailIfExistF("users", $email)) {
-    $avatar = null;
-    if (isset($_FILES["img"])) {
-      $uploadedFile = uploadImg($_FILES["img"], "../media");
-      $avatar = $uploadedFile->success ? $uploadedFile->file_name : null;
-    }
 
-    $insertData = array(
-      "fname" => ucwords($fname),
-      "mname" => ucwords($mname),
-      "lname" => ucwords($lname),
-      "course_id" => $course_id,
-      "email" => $email,
-      "contact" => $contact,
-      "role" => $course_id ? "teacher" : "staff",
-      "avatar" => $avatar,
-      "password" => password_hash($password, PASSWORD_ARGON2I),
-      "is_verified" => "1"
-    );
+    if (strlen($contact) == 11) {
+      $avatar = null;
+      if (isset($_FILES["img"])) {
+        $uploadedFile = uploadImg($_FILES["img"], "../media");
+        $avatar = $uploadedFile->success ? $uploadedFile->file_name : null;
+      }
 
-    $insert = insert("users", $insertData);
+      $insertData = array(
+        "fname" => ucwords($fname),
+        "mname" => ucwords($mname),
+        "lname" => ucwords($lname),
+        "course_id" => $course_id,
+        "email" => $email,
+        "contact" => $contact,
+        "role" => $course_id ? "teacher" : "staff",
+        "avatar" => $avatar,
+        "password" => password_hash($password, PASSWORD_DEFAULT),
+        "is_verified" => "1"
+      );
 
-    if ($insert) {
-      $response["success"] = true;
-      $response["message"] = "Your account is successfully created.<br>You can now login to your account.";
+      $insert = insert("users", $insertData);
+
+      if ($insert) {
+        $response["success"] = true;
+        $response["message"] = "Your account is successfully created.<br>You can now login to your account.";
+      } else {
+        $response["success"] = false;
+        $response["message"] = mysqli_error($conn);
+      }
     } else {
       $response["success"] = false;
-      $response["message"] = mysqli_error($conn);
+      $response["message"] = "Contact number should be 11 digits.<br>Your entered (" . strlen($contact) . ") only.";
     }
   } else {
     $response["success"] = false;
@@ -509,36 +526,42 @@ function create_student_account()
   $password = $_POST["password"];
 
   if (!checkEmailIfExistF("users", $email)) {
-    $avatar = null;
-    if (isset($_FILES["img"])) {
-      $uploadedFile = uploadImg($_FILES["img"], "../media");
-      $avatar = $uploadedFile->success ? $uploadedFile->file_name : null;
-    }
 
-    $insertData = array(
-      "fname" => ucwords($fname),
-      "mname" => ucwords($mname),
-      "lname" => ucwords($lname),
-      "course_id" => $course_id,
-      "year" => $year,
-      "section" => strtoupper($section),
-      "sy" => $sy,
-      "email" => $email,
-      "contact" => $contact,
-      "role" => "student",
-      "avatar" => $avatar,
-      "password" => password_hash($password, PASSWORD_ARGON2I),
-      "is_verified" => "set_zero"
-    );
+    if (strlen($contact) == 11) {
+      $avatar = null;
+      if (isset($_FILES["img"])) {
+        $uploadedFile = uploadImg($_FILES["img"], "../media");
+        $avatar = $uploadedFile->success ? $uploadedFile->file_name : null;
+      }
 
-    $insert = insert("users", $insertData);
+      $insertData = array(
+        "fname" => ucwords($fname),
+        "mname" => ucwords($mname),
+        "lname" => ucwords($lname),
+        "course_id" => $course_id,
+        "year" => $year,
+        "section" => strtoupper($section),
+        "sy" => $sy,
+        "email" => $email,
+        "contact" => $contact,
+        "role" => "student",
+        "avatar" => $avatar,
+        "password" => password_hash($password, PASSWORD_DEFAULT),
+        "is_verified" => "set_zero"
+      );
 
-    if ($insert) {
-      $response["success"] = true;
-      $response["message"] = "Your account is successfully created.<br>You can now login to your account.";
+      $insert = insert("users", $insertData);
+
+      if ($insert) {
+        $response["success"] = true;
+        $response["message"] = "Your account is successfully created.<br>You can now login to your account.";
+      } else {
+        $response["success"] = false;
+        $response["message"] = mysqli_error($conn);
+      }
     } else {
       $response["success"] = false;
-      $response["message"] = mysqli_error($conn);
+      $response["message"] = "Contact number should be 11 digits.<br>Your entered (" . strlen($contact) . ") only.";
     }
   } else {
     $response["success"] = false;
@@ -557,33 +580,38 @@ function add_admin()
   $lname = $_POST["lname"];
   $email = $_POST["email"];
   $contact = $_POST["contact"];
-  $password = password_hash("admin123", PASSWORD_ARGON2I);
+  $password = password_hash("admin123", PASSWORD_DEFAULT);
 
   if (!checkEmailIfExistF("users", $email)) {
-    $uploadedFile = uploadImg($_FILES["img"], "../media");
-    $avatar = $uploadedFile->success ? $uploadedFile->file_name : null;
+    if (strlen($contact) == 11) {
+      $uploadedFile = uploadImg($_FILES["img"], "../media");
+      $avatar = $uploadedFile->success ? $uploadedFile->file_name : null;
 
-    $insertData = array(
-      "fname" => ucwords($fname),
-      "mname" => ucwords($mname),
-      "lname" => ucwords($lname),
-      "email" => $email,
-      "contact" => $contact,
-      "role" => "admin",
-      "avatar" => $avatar,
-      "password" => $password,
-      "isNew" => "1"
-    );
+      $insertData = array(
+        "fname" => ucwords($fname),
+        "mname" => ucwords($mname),
+        "lname" => ucwords($lname),
+        "email" => $email,
+        "contact" => $contact,
+        "role" => "admin",
+        "avatar" => $avatar,
+        "password" => $password,
+        "isNew" => "1"
+      );
 
-    $insert = insert("users", $insertData);
+      $insert = insert("users", $insertData);
 
-    if ($insert) {
-      $response["success"] = true;
-      $response["message"] = "Admin successfully added.<br>The default password is <strong>\"admin123\"</strong>";
-      insertActivity(("<strong>Added new admin:</strong> '" . getFullName($insert, "with_middle") . "'."), $_SESSION["userId"]);
+      if ($insert) {
+        $response["success"] = true;
+        $response["message"] = "Admin successfully added.<br>The default password is <strong>\"admin123\"</strong>";
+        insertActivity(("<strong>Added new admin:</strong> '" . getFullName($insert, "with_middle") . "'."), $_SESSION["userId"]);
+      } else {
+        $response["success"] = false;
+        $response["message"] = mysqli_error($conn);
+      }
     } else {
       $response["success"] = false;
-      $response["message"] = mysqli_error($conn);
+      $response["message"] = "Contact number should be 11 digits.<br>Your entered (" . strlen($contact) . ") only.";
     }
   } else {
     $response["success"] = false;
@@ -613,7 +641,7 @@ function change_password()
     $update = update(
       "users",
       array(
-        "password" => password_hash($new, PASSWORD_ARGON2I),
+        "password" => password_hash($new, PASSWORD_DEFAULT),
         "isNew" => "set_null"
       ),
       "id",
@@ -696,69 +724,74 @@ function update_user()
   $email = $_POST["email"];
 
   if (!checkEmailIfExistF("users", $email, $userId)) {
-    $avatar = null;
-    if (isset($_FILES["img"])) {
-      if ($_POST["imgIsCleared"] == "yes") {
-        $avatar = "set_null";
-      } else {
-        $uploadedFile = uploadImg($_FILES["img"], "../media");
-        $avatar = $uploadedFile->success ? $uploadedFile->file_name : null;
+    if (strlen($contact) == 11) {
+      $avatar = null;
+      if (isset($_FILES["img"])) {
+        if ($_POST["imgIsCleared"] == "yes") {
+          $avatar = "set_null";
+        } else {
+          $uploadedFile = uploadImg($_FILES["img"], "../media");
+          $avatar = $uploadedFile->success ? $uploadedFile->file_name : null;
+        }
       }
-    }
 
-    if ($_POST["role"] == "admin") {
-      $updateData = array(
-        "fname" => ucwords($fname),
-        "mname" => ucwords($mname),
-        "lname" => ucwords($lname),
-        "email" => $email,
-        "contact" => $contact,
-        "avatar" => $avatar,
-      );
-    } else {
-      $course_id = $_POST["course_id"];
-
-      if ($_POST["role"] == "teacher") {
+      if ($_POST["role"] == "admin" || $_POST["role"] == "staff") {
         $updateData = array(
           "fname" => ucwords($fname),
           "mname" => ucwords($mname),
           "lname" => ucwords($lname),
-          "course_id" => $course_id,
           "email" => $email,
           "contact" => $contact,
-          "role" => "student",
           "avatar" => $avatar,
         );
       } else {
-        // Role Student
-        $sy = $_POST["sy"];
-        $year = $_POST["year"];
-        $section = $_POST["section"];
+        $course_id = $_POST["course_id"];
 
-        $updateData = array(
-          "fname" => ucwords($fname),
-          "mname" => ucwords($mname),
-          "lname" => ucwords($lname),
-          "course_id" => $course_id,
-          "year" => $year,
-          "section" => strtoupper($section),
-          "sy" => $sy,
-          "email" => $email,
-          "contact" => $contact,
-          "role" => "student",
-          "avatar" => $avatar,
-        );
+        if ($_POST["role"] == "teacher") {
+          $updateData = array(
+            "fname" => ucwords($fname),
+            "mname" => ucwords($mname),
+            "lname" => ucwords($lname),
+            "course_id" => $course_id,
+            "email" => $email,
+            "contact" => $contact,
+            "role" => "teacher",
+            "avatar" => $avatar,
+          );
+        } else {
+          // Role Student
+          $sy = $_POST["sy"];
+          $year = $_POST["year"];
+          $section = $_POST["section"];
+
+          $updateData = array(
+            "fname" => ucwords($fname),
+            "mname" => ucwords($mname),
+            "lname" => ucwords($lname),
+            "course_id" => $course_id,
+            "year" => $year,
+            "section" => strtoupper($section),
+            "sy" => $sy,
+            "email" => $email,
+            "contact" => $contact,
+            "role" => "student",
+            "avatar" => $avatar,
+          );
+        }
       }
-    }
 
-    $update = update("users", $updateData, "id", $userId);
+      $update = update("users", $updateData, "id", $userId);
 
-    if ($update) {
-      $response["success"] = true;
-      $response["message"] = "Profile successfully updated";
+      if ($update) {
+        $response["success"] = true;
+        $response["message"] = "Profile successfully updated";
+      } else {
+        $response["success"] = false;
+        $response["message"] = mysqli_error($conn);
+      }
     } else {
       $response["success"] = false;
-      $response["message"] = mysqli_error($conn);
+      $response["message"] = "Contact number should be 11 digits.<br>Your entered (" . strlen($contact) . ") only.";
     }
   } else {
     $response["success"] = false;

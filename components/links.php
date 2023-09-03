@@ -10,8 +10,8 @@ $links = array(
   ),
   array(
     "title" => "Announcements",
-    "url" => "$SERVER_NAME/views/announcements",
-    "allowedViews" => array("admin", "student", "teacher", "alumni"),
+    "url" => "$SERVER_NAME/views/admin/announcements",
+    "allowedViews" => array("admin"),
     "config" => array(
       "icon" => "mdi mdi-bullhorn"
     )
@@ -62,6 +62,14 @@ $links = array(
     "allowedViews" => array("admin"),
     "config" => array(
       "icon" => "mdi mdi-history"
+    )
+  ),
+  array(
+    "title" => "Announcements",
+    "url" => "$SERVER_NAME/views/user/announcements",
+    "allowedViews" => array("student", "teacher", "alumni"),
+    "config" => array(
+      "icon" => "mdi mdi-bullhorn"
     )
   ),
   array(

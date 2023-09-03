@@ -81,13 +81,19 @@ if (!$isLogin) {
                             </div>
                           </div>
 
-                          <?php if ($user->course_id) : ?>
+                          <?php if ($user->role != "admin" && $user->role  != "staff") : ?>
                             <div class="form-group mb-3">
                               <div class="row">
                                 <label class="col-md-4 col-lg-3 col-form-label pb-0">Course</label>
                                 <div class="col-md-8 col-lg-9">
-                                  <?php $courseData = getTableSingleDataById("course", "course_id", $user->course_id); ?>
-                                  <input type="text" class="form-control" value="<?= "($courseData->acronym) $courseData->name" ?>" readonly>
+                                  <select name="course_id" class=" form-control" required>
+                                    <?php
+                                    $getCourseData = getTableData("course");
+                                    foreach ($getCourseData as $course) :
+                                    ?>
+                                      <option value="<?= $course->course_id ?>" <?= isSelected($course->course_id, $user->course_id) ?>><?= "($course->acronym) $course->name" ?></option>
+                                    <?php endforeach; ?>
+                                  </select>
                                 </div>
                               </div>
                             </div>

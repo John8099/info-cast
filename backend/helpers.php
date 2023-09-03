@@ -4,7 +4,7 @@ $dateNow = date("Y-m-d H:i:s");
 
 $separator = "!I_I!";
 
-$ORIGIN = "http://$_SERVER[SERVER_NAME]";
+$ORIGIN = "$_SERVER[REQUEST_SCHEME]://$_SERVER[SERVER_NAME]";
 $PATH = ("/" . explode("/", $_SERVER["REQUEST_URI"])[1]);
 
 $divDisplayId = 'display';
@@ -17,7 +17,13 @@ $inputIsClearedName = "imgIsCleared";
 
 $SERVER_NAME = "";
 
-function sendSms($c_number)
+if (inWhiteList($_SERVER['REMOTE_ADDR'])) {
+  $SERVER_NAME = ($ORIGIN . $PATH);
+} else {
+  $SERVER_NAME = ($ORIGIN);
+}
+
+function sendSms($c_number, $message)
 {
   require_once(__DIR__ . '/vendor/autoload.php');
 
@@ -28,7 +34,7 @@ function sendSms($c_number)
 
   $apiInstance = new ClickSend\Api\SMSApi(new GuzzleHttp\Client(), $config);
   $msg = new \ClickSend\Model\SmsMessage();
-  $msg->setBody("This is send through info cast system");
+  $msg->setBody($message);
   $msg->setTo($c_number);
   $msg->setSource("sdk");
 
@@ -38,7 +44,7 @@ function sendSms($c_number)
 
   try {
     $result = $apiInstance->smsSendPost($sms_messages);
-    returnResponse($result);
+    // returnResponse($result);
   } catch (Exception $e) {
     echo 'Exception when calling SMSApi->smsSendPost: ', $e->getMessage(), PHP_EOL;
   }
@@ -97,12 +103,6 @@ function get_enum_values($table, $field)
   $enum = explode("','", $matches[1]);
   sort($enum);
   return $enum;
-}
-
-if (inWhiteList($_SERVER['REMOTE_ADDR'])) {
-  $SERVER_NAME = ($ORIGIN . $PATH);
-} else {
-  $SERVER_NAME = ($ORIGIN);
 }
 
 function generateModalImg($modalId, $modalImg, $captionId)

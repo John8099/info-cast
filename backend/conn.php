@@ -5,10 +5,10 @@ if ($_SERVER['HTTP_HOST'] == "localhost") {
   $password = "";
   $db = "info_cast";
 } else {
-  $host = "";
-  $user = "";
-  $password = "";
-  $db = "";
+  $host = "localhost";
+  $user = "id21207474_infocast";
+  $password = "Dummy44what!";
+  $db = "id21207474_infocast";
 }
 
 $response = array(
